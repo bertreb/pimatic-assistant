@@ -60,32 +60,33 @@ module.exports = (env) ->
         '&notify=' + notify + 
         '&group=' + encodeURIComponent(@group)
 
-      @socket = io(uri) if _.size(@configDevices) > 0
-  
-      @socket.on 'connect', () =>
-        env.logger.debug "NORA - connected to Nora server"
-        @_setPresence(true)
-        @getSyncDevices(@configDevices)
-        .then((syncDevices)=>
-          @socket.emit('sync', syncDevices, 'req:sync')
-          env.logger.debug "NORA - devices synced: " + JSON.stringify(syncDevices,null,2)
-        )
+      if _.size(@configDevices) > 0
+        @socket = io(uri) 
+        
+        @socket.on 'connect', () =>
+          env.logger.debug "NORA - connected to Nora server"
+          @_setPresence(true)
+          @getSyncDevices(@configDevices)
+          .then((syncDevices)=>
+            @socket.emit('sync', syncDevices, 'req:sync')
+            env.logger.debug "NORA - devices synced: " + JSON.stringify(syncDevices,null,2)
+          )
 
-      @socket.on 'disconnect', =>
-        env.logger.debug "NORA - disconnected from Nora server"
-        @_setPresence(false)
-      
-      @socket.on 'update', (changes) => 
-        env.logger.debug "NORA - update received " + JSON.stringify(changes,null,2)
-        @handleUpdate(changes)
-        .then((result)=>
-        )
+        @socket.on 'disconnect', =>
+          env.logger.debug "NORA - disconnected from Nora server"
+          @_setPresence(false)
+        
+        @socket.on 'update', (changes) => 
+          env.logger.debug "NORA - update received " + JSON.stringify(changes,null,2)
+          @handleUpdate(changes)
+          .then((result)=>
+          )
 
-      @socket.on 'action-error', (reqId, msg) =>
-        env.logger.debug "NORA - action-error received, reqId " + reqId + ", msg: " + JSON.stringify(msg,null,2)
+        @socket.on 'action-error', (reqId, msg) =>
+          env.logger.debug "NORA - action-error received, reqId " + reqId + ", msg: " + JSON.stringify(msg,null,2)
 
-      @socket.on 'activate-scene', (ids, deactivate) =>
-        env.logger.debug "NORA - activate-scene, ids " + JSON.stringify(ids,null,2) + ", deactivate: " + deactivate
+        @socket.on 'activate-scene', (ids, deactivate) =>
+          env.logger.debug "NORA - activate-scene, ids " + JSON.stringify(ids,null,2) + ", deactivate: " + deactivate
 
       @framework.on "deviceRemoved", (device) =>
         if _.find(@config.devices, (d) => d.pimatic_device_id == device.id)
@@ -223,8 +224,9 @@ module.exports = (env) ->
       )
 
     destroy: ->
-      @socket.disconnect()
-      @socket.removeAllListeners()
+      if @socket?
+        @socket.disconnect()
+        @socket.removeAllListeners()
       @_setPresence(false)
       super()
 

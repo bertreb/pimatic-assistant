@@ -5,7 +5,7 @@ Background
 ---
 The Assistant plugin lets you connect a Pimatic home automation system with a Google assistant via Nora.
 Nora is a **NO**de-**R**ed home **A**utomation solution build by [Andrei Tatar](https://github.com/andrei-tatar). Nora consists of a plugin for Node-red and the Nora server that acts as a gateway between Node-red and Google Assistant.
-For this plugin I'm bypassing node-red and using the nora server directly.
+For this plugin I'm not using node-red but use the Nora server directly.
 This plugin is also based on the work done for the Pimatic-gBridge plugin. Because the gBridge service is stopped, this plugin will be a good replacement.
 
 ---
