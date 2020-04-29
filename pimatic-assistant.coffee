@@ -60,7 +60,6 @@ module.exports = (env) ->
         '&notify=' + notify + 
         '&group=' + encodeURIComponent(@group)
 
-      if _.size(@configDevices) > 0
         @socket = io(uri) 
         
         @socket.on 'connect', () =>
@@ -70,6 +69,8 @@ module.exports = (env) ->
           .then((syncDevices)=>
             @socket.emit('sync', syncDevices, 'req:sync')
             env.logger.debug "NORA - devices synced: " + JSON.stringify(syncDevices,null,2)
+            if _.size(@configDevices) is 0
+              @socket.disconnect()
           )
 
         @socket.on 'disconnect', =>
@@ -87,6 +88,7 @@ module.exports = (env) ->
 
         @socket.on 'activate-scene', (ids, deactivate) =>
           env.logger.debug "NORA - activate-scene, ids " + JSON.stringify(ids,null,2) + ", deactivate: " + deactivate
+
 
       @framework.on "deviceRemoved", (device) =>
         if _.find(@config.devices, (d) => d.pimatic_device_id == device.id)
