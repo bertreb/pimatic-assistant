@@ -1,0 +1,48 @@
+{
+  "name": "pimatic-assistant",
+  "description": "Plugin for connecting a Pimatic system via Nora to Google Assistant",
+  "author": {
+    "name": "Bert Gierveld",
+    "email": "gitbertreb@gmail.com",
+    "url": "https://github.com/bertreb"
+  },
+  "main": "pimatic-assistant",
+  "files": [
+    "pimatic-assistant.coffee",
+    "pimatic-assistant-config-schema.coffee",
+    "device-config-schema.coffee",
+    "adapters/light.coffee",
+    "adapters/lightcolor.coffee",
+    "adapters/switch.coffee",
+    "adapters/button.coffee",
+    "adapters/shutter.coffee",
+    "adapters/heatingthermostat.coffee",
+    "README.md",
+    "LICENSE"
+  ],
+  "homepage": "https://github.com/bertreb/pimatic-assistant.git",
+  "keywords": [
+    "pimatic",
+    "nora",
+    "google",
+    "assistant"
+  ],
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bertreb/pimatic-assistant.git"
+  },
+  "configSchema": "pimatic-assistant-config-schema.coffee",
+  "dependencies": {
+    "color": "^3.1.2",
+    "lodash": "^4.17.15",
+    "socket.io-client": "^2.3.0"
+  },
+  "peerDependencies": {
+    "pimatic": "0.9.*"
+  },
+  "engines": {
+    "node": ">=4",
+    "npm": ">=2"
+  }
+}
