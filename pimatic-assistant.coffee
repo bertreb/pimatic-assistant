@@ -60,10 +60,11 @@ module.exports = (env) ->
         '&notify=' + notify + 
         '&group=' + encodeURIComponent(@group)
 
-      @socket = io(uri)
+      @socket = io(uri) if _.size(@configDevices) > 0
   
       @socket.on 'connect', () =>
-        env.logger.debug "NORA - connected to nora server"
+        env.logger.debug "NORA - connected to Nora server"
+        @_setPresence(true)
         @getSyncDevices(@configDevices)
         .then((syncDevices)=>
           @socket.emit('sync', syncDevices, 'req:sync')
@@ -71,7 +72,8 @@ module.exports = (env) ->
         )
 
       @socket.on 'disconnect', =>
-        env.logger.debug "NORA - disconnected to nore server"
+        env.logger.debug "NORA - disconnected from Nora server"
+        @_setPresence(false)
       
       @socket.on 'update', (changes) => 
         env.logger.debug "NORA - update received " + JSON.stringify(changes,null,2)
@@ -223,6 +225,7 @@ module.exports = (env) ->
     destroy: ->
       @socket.disconnect()
       @socket.removeAllListeners()
+      @_setPresence(false)
       super()
 
 

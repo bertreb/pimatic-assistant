@@ -17,27 +17,27 @@ module.exports = {
           type: "object"
           properties:
             name:
-              descpription: "the assistant device name, and command used in GoogleAssistant"
+              descpription: "The device name used in Google Assistant"
               type: "string"
               required: true
             roomHint:
-              description: "The roomHint used for grouping devices to a room"
+              description: "The roomHint used for grouping devices to a room in Google Assistant"
               type: "string"
               required: false
             pimatic_device_id:
-              descpription: "the pimatic device ID"
+              descpription: "The pimatic device ID"
               type: "string"
               required: true
             pimatic_subdevice_id:
-              description: " the ID of the subdevice like a button name"
+              description: " The ID of the subdevice like a button name"
               type: "string"
               required: false
             auxiliary:
-              description: "adapter specific field to add functionality to the bridge"
+              description: "Adapter specific field to add functionality"
               type: "string"
               required: false
             auxiliary2:
-              description: "adapter specific field to add 2nd functionality to the bridge"
+              description: "Adapter specific field to add 2nd functionality"
               type: "string"
               required: false
             twofa:
