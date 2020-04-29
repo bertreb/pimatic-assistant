@@ -1,2 +1,2 @@
 # pimatic-assistant
-Plugin for connecting a Pimatic system via Nora and Node-red to Google Assistant
+Plugin for connecting a Pimatic system via Nora to Google Assistant
