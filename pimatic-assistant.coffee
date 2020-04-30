@@ -119,7 +119,6 @@ module.exports = (env) ->
               auxiliary2: _device.auxiliary2
               twoFa: _device.twofa
             #twoFaPin: if _value.twofaPin? then _value.twofaPin else undefined
-            devices[_device.pimatic_device_id] = {}
             if pimaticDevice.config.class is "MilightRGBWZone" or pimaticDevice.config.class is "MilightFullColorZone"
               env.logger.debug "MiLight device found"
               _newDevice = new lightColorAdapter(_adapterConfig)
@@ -147,10 +146,12 @@ module.exports = (env) ->
             else if (pimaticDevice.config.class).indexOf("Switch") >= 0
               env.logger.debug "Switch device found"
               _newDevice = new switchAdapter(_adapterConfig)
+              devices[_device.pimatic_device_id] = {}
 
             else if pimaticDevice instanceof env.devices.ButtonsDevice
               env.logger.debug "Buttons device found"
               _newDevice = new buttonAdapter(_adapterConfig)
+              devices[_device.pimatic_device_id] = {}
 
               ###
               else if pimaticDevice instanceof env.devices.Sensor and pimaticDevice.hasAttribute('contact')
@@ -174,6 +175,7 @@ module.exports = (env) ->
             else if pimaticDevice instanceof env.devices.ShutterController
               env.logger.debug "Shutter device found"
               _newDevice = new shutterAdapter(_adapterConfig)
+              devices[_device.pimatic_device_id] = {}
 
               ###
               else if pimaticDevice.hasAttribute(_value.auxiliary)
