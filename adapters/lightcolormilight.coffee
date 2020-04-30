@@ -4,7 +4,7 @@ module.exports = (env) ->
   events = require 'events'
   Color = require 'color'
 
-  class LightColorAdapter extends events.EventEmitter
+  class LightColorMilightAdapter extends events.EventEmitter
 
     constructor: (adapterConfig) ->
 
@@ -80,11 +80,11 @@ module.exports = (env) ->
       @state.color = change.color
       @device.changeStateTo(change.on) if @stateAvavailable
       @device.changeDimlevelTo(change.brightness)
-      #hueMilight = (256 + 176 - Math.floor(Number(change.color.spectrumHsv.hue) / 360.0 * 255.0)) % 256
+      hueMilight = (256 + 176 - Math.floor(Number(change.color.spectrumHsv.hue) / 360.0 * 255.0)) % 256
       #hsv =[hueMilight,change.color.spectrumHsv.saturation,change.color.spectrumHsv.value]
       #color = Color(hsv).hex()
-      env.logger.info "hue = " + change.color.spectrumHsv.hue
-      @device.changeHueTo(change.color.spectrumHsv.hue)
+      env.logger.info "hueMilight = " + hueMilight
+      @device.changeHueTo(hueMilight)
 
     updateState: (newState) =>
       unless newState is @state.on

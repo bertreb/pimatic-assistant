@@ -5,6 +5,7 @@ module.exports = (env) ->
   switchAdapter = require('./adapters/switch')(env)
   lightAdapter = require('./adapters/light')(env)
   lightColorAdapter = require('./adapters/lightcolor')(env)
+  lightColorMilightAdapter = require('./adapters/lightcolormilight')(env)
   buttonAdapter = require('./adapters/button')(env)
   shutterAdapter = require('./adapters/shutter')(env)
   heatingThermostatAdapter = require('./adapters/heatingthermostat')(env)
@@ -121,12 +122,13 @@ module.exports = (env) ->
             #twoFaPin: if _value.twofaPin? then _value.twofaPin else undefined
             if pimaticDevice.config.class is "MilightRGBWZone" or pimaticDevice.config.class is "MilightFullColorZone"
               env.logger.debug "MiLight device found"
-              _newDevice = new lightColorAdapter(_adapterConfig)
+              _newDevice = new lightColorMilightAdapter(_adapterConfig)
               devices[_device.pimatic_device_id] = 
                 brightnessControl: true
                 turnOnWhenBrightnessChanges: false
                 colorControl: true
-            else if ((pimaticDevice.config.class).toLowerCase()).indexOf("rgb") >= 0
+
+            else if ((pimaticDevice.config.class).toLowerCase()).indexOf("rgb") >= 0 or ((pimaticDevice.config.class).toLowerCase()).indexOf("ct") >= 0
               env.logger.debug "Light device found"
               _newDevice = new lightColorAdapter(_adapterConfig)
               devices[_device.pimatic_device_id] = 
