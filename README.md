@@ -80,7 +80,7 @@ Device configuration
 2-step confirmation (twofa) is supported. When you anable twofa you can use "ack", the assistant will ask if you are sure you what to execute the action. When you enable "pin", Google Assistant will ask for the pin to confirm the action. You need to enter the pin via the 'keyboard'.
 
 #### Deleting an Assistant device
-Before you delete an Assistant device, please remove first all devices in the config and save the config. After that you can delete the Assistant device.
+Before you delete an Assistant device, please remove first all devices in the Assistant device config and save the config. After that you can delete the Assistant device.
 
 -----------------
 
