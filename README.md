@@ -50,9 +50,6 @@ Some specific configurations:
 #### Shutter
 For the Shutter device the auxiliary field is used to control a shutter via a shell script. The position of the shutter (the value) is added at the end of the script (with a space) before executing the script. A return value is used as actual shutter position.
 
-#### Milight / Light
-For the Milight devices automatic configuration is not implemented. You need to configure the milight device in gBridge (with the traits 'OnOff', 'Brightness' and 'colorsettingrgb') and after that configure(add) the milight device in config of the gBridge device in Pimatic. The name you used for the Milight device in gBridge must by exactly the same as the name in pimatic gBridge! When you want to change the name of a Milight device you have to reinstall it in gBridge (because automatic configuration isn't supported)
-
 #### Thermostat
 For the HeatingThermostat you can add a temperature/humidity sensor. In the auxiliary field, add the device-id of the temperature/humidity sensor. The sensor needs to have 'temperature' and 'humidity' named attributes. If the attribute names are different, you can put a variables devices 'in between' (which converts the attribute names to 'temperature' and 'humidity').
 The heating device is only using the temperature setting of the device.
@@ -66,10 +63,10 @@ Device configuration
 {
   "id": "<assistant-device-id>",
   "class": "AssistantDevice",
-  	token:    "The token from Nora"
+    token:    "The token from Nora"
     devices:  "list of devices connected to Google Assistant"
-      name:                 "the gBridge device name, and command used in Google Assistant"
-      roomHint:				"the optional roomname used in Google Assistant"
+      name:                 "the device name, and command used in Google Assistant"
+      roomHint:             "the optional roomname used in Google Assistant"
       pimatic_device_id:    "the ID of the pimatic device"
       pimatic_subdevice_id: "the ID of a pimatic subdevice, only needed for a button id"
       auxiliary:            "adapter specific field to add functionality"
