@@ -118,23 +118,14 @@ module.exports = (env) ->
               auxiliary2: _device.auxiliary2
               twoFa: _device.twofa
             #twoFaPin: if _value.twofaPin? then _value.twofaPin else undefined
-            ###
-            if pimaticDevice.config.class is "MilightRGBWZone" or pimaticDevice.config.class is "MilightFullColorZone"
-              env.logger.debug "Add MilightRGBWZone adapter with ID: " + pimaticDevice.id
-            ###
-            #else if pimaticDevice.config.class is "ShellSwitch"
-            #  env.logger.debug "Add scene adapter with ID: " + pimaticDevice.id
-            #  @addAdapter(new sceneAdapter(_adapterConfig))
-
             devices[_device.pimatic_device_id] = {}
-            if (pimaticDevice.config.class).indexOf("Dimmer") >= 0
-              env.logger.debug "Light device found"
-              _newDevice = new lightAdapter(_adapterConfig)
+            if pimaticDevice.config.class is "MilightRGBWZone" or pimaticDevice.config.class is "MilightFullColorZone"
+              env.logger.debug "MiLight device found"
+              _newDevice = new lightColorAdapter(_adapterConfig)
               devices[_device.pimatic_device_id] = 
                 brightnessControl: true
                 turnOnWhenBrightnessChanges: false
-                colorControl: false
-
+                colorControl: true
             else if (pimaticDevice.config.class).indexOf("RGB") >= 0
               env.logger.debug "Light device found"
               _newDevice = new lightColorAdapter(_adapterConfig)
@@ -142,6 +133,15 @@ module.exports = (env) ->
                 brightnessControl: true
                 turnOnWhenBrightnessChanges: false
                 colorControl: true
+
+            else if (pimaticDevice.config.class).indexOf("Dimmer") >= 0
+              env.logger.debug "Light device found"
+              _newDevice = new lightAdapter(_adapterConfig)
+              devices[_device.pimatic_device_id] = 
+                brightnessControl: true
+                turnOnWhenBrightnessChanges: false
+                colorControl: false
+
 
             else if (pimaticDevice.config.class).indexOf("Switch") >= 0
               env.logger.debug "Switch device found"

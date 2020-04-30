@@ -41,6 +41,7 @@ module.exports = (env) ->
       @twoFaPin = adapterConfig.twoFaPin
 
       @stateAvavailable = @device.hasAction("changeStateTo")
+      env.logger.info "HasAction state " + @stateAvavailable 
 
       @device.on 'state', deviceStateHandler if @stateAvavailable
       @device.on 'dimlevel', deviceDimlevelHandler
@@ -79,10 +80,11 @@ module.exports = (env) ->
       @state.color = change.color
       @device.changeStateTo(change.on) if @stateAvavailable
       @device.changeDimlevelTo(change.brightness)
-      hsv =[change.color.spectrumHsv.hue,change.color.spectrumHsv.saturation,change.color.spectrumHsv.value]
-      color = Color(hsv).hex()
-      env.logger.info "Color = " + color
-      @device.changeHueTo(change.color.spectrumHsv.hue*255/360)
+      hueMilight = (256 + 176 - Math.floor(Number(change.color.spectrumHsv.hue) / 360.0 * 255.0)) % 256
+      #hsv =[hueMilight,change.color.spectrumHsv.saturation,change.color.spectrumHsv.value]
+      #color = Color(hsv).hex()
+      env.logger.info "hueMilight = " + hueMilight
+      @device.changeHueTo(hueMilight)
 
     updateState: (newState) =>
       unless newState is @state.on
