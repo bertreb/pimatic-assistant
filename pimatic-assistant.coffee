@@ -125,52 +125,31 @@ module.exports = (env) ->
             #else if pimaticDevice.config.class is "ShellSwitch"
             #  env.logger.debug "Add scene adapter with ID: " + pimaticDevice.id
             #  @addAdapter(new sceneAdapter(_adapterConfig))
-          
+
+            devices[_device.pimatic_device_id] = {}
             if (pimaticDevice.config.class).indexOf("Dimmer") >= 0
               env.logger.debug "Light device found"
               _newDevice = new lightAdapter(_adapterConfig)
               devices[_device.pimatic_device_id] = 
-                type: _newDevice.getType()
                 brightnessControl: true
                 turnOnWhenBrightnessChanges: false
                 colorControl: false
-                name: _device.name
-                state: _newDevice.getState()
-              devices[_device.pimatic_device_id]["roomHint"] = _device.roomHint if _device.roomHint?
-              @handlers[_device.pimatic_device_id] = _newDevice
 
             else if (pimaticDevice.config.class).indexOf("RGB") >= 0
               env.logger.debug "Light device found"
               _newDevice = new lightColorAdapter(_adapterConfig)
               devices[_device.pimatic_device_id] = 
-                type: _newDevice.getType()
                 brightnessControl: true
                 turnOnWhenBrightnessChanges: false
                 colorControl: true
-                name: _device.name
-                state: _newDevice.getState()
-              devices[_device.pimatic_device_id]["roomHint"] = _device.roomHint if _device.roomHint?
-              @handlers[_device.pimatic_device_id] = _newDevice
 
             else if (pimaticDevice.config.class).indexOf("Switch") >= 0
               env.logger.debug "Switch device found"
               _newDevice = new switchAdapter(_adapterConfig)
-              devices[_device.pimatic_device_id] = 
-                type: _newDevice.getType()
-                name: _device.name
-                state: _newDevice.getState()
-              devices[_device.pimatic_device_id]["roomHint"] = _device.roomHint if _device.roomHint?
-              @handlers[_device.pimatic_device_id] = _newDevice
 
             else if pimaticDevice instanceof env.devices.ButtonsDevice
               env.logger.debug "Buttons device found"
               _newDevice = new buttonAdapter(_adapterConfig)
-              devices[_device.pimatic_device_id] = 
-                type: _newDevice.getType()
-                name: _device.name
-                state: _newDevice.getState()
-              devices[_device.pimatic_device_id]["roomHint"] = _device.roomHint if _device.roomHint?
-              @handlers[_device.pimatic_device_id] = _newDevice
 
               ###
               else if pimaticDevice instanceof env.devices.Sensor and pimaticDevice.hasAttribute('contact')
@@ -185,27 +164,15 @@ module.exports = (env) ->
               _adapterConfig["auxiliary"] = @ambiantDevice
               _newDevice = new heatingThermostatAdapter(_adapterConfig)
               devices[_device.pimatic_device_id] = 
-                type: _newDevice.getType()
-                name: _device.name
-                state: _newDevice.getState()
                 temperatureUnit: "C"
                 bufferRangeCelsius: 2
                 commandOnlyTemperatureSetting: false
                 queryOnlyTemperatureSetting: false
-              devices[_device.pimatic_device_id]["availableModes"] = _newDevice.getModes()
-              devices[_device.pimatic_device_id]["roomHint"] = _device.roomHint if _device.roomHint?
-              #devices[_device.pimatic_device_id]["auxiliary"] = _newDevice.getAmbiant() if @ambiantDevice?
-              @handlers[_device.pimatic_device_id] = _newDevice
+                availableModes: _newDevice.getModes()
 
             else if pimaticDevice instanceof env.devices.ShutterController
               env.logger.debug "Shutter device found"
               _newDevice = new shutterAdapter(_adapterConfig)
-              devices[_device.pimatic_device_id] = 
-                type: _newDevice.getType()
-                name: _device.name
-                state: _newDevice.getState()
-              devices[_device.pimatic_device_id]["roomHint"] = _device.roomHint if _device.roomHint?
-              @handlers[_device.pimatic_device_id] = _newDevice
 
               ###
               else if pimaticDevice.hasAttribute(_value.auxiliary)
@@ -214,7 +181,19 @@ module.exports = (env) ->
               ###
 
             else
-              env.logger.debug "Device type does not exist"
+              env.logger.debug "Device type #{pimaticDevice.config.class} is not supported!"
+
+            devices[_device.pimatic_device_id]["type"] = _newDevice.getType()
+            devices[_device.pimatic_device_id]["name"] = _device.name
+            devices[_device.pimatic_device_id]["state"] = _newDevice.getState()
+            unless _device.twofa is "none"
+              devices[_device.pimatic_device_id]["twoFactor"] = _device.twofa
+              if _device.twofa is "pin"
+                devices[_device.pimatic_device_id]["pin"] = _device.pin ? "0000"
+
+            devices[_device.pimatic_device_id]["roomHint"] = _device.roomHint if _device.roomHint?
+            @handlers[_device.pimatic_device_id] = _newDevice
+
         resolve(devices)
       )
 

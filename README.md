@@ -4,7 +4,7 @@ Plugin for connecting a Pimatic system via Nora to Google Assistant
 Background
 -------
 The Assistant plugin lets you connect a Pimatic home automation system with a Google assistant via Nora.
-Nora is a **NO**de-**R**ed home **A**utomation solution build by [Andrei Tatar](https://github.com/andrei-tatar). Nora consists of a plugin for Node-red and the Nora server that acts as a gateway between Node-red and Google Assistant.
+Nora is a **NO**de-**R**ed home **A**utomation solution build by [Andrei Tatar](https://github.com/andrei-tatar). Nora consists of a plugin for Node-red and the Nora backend server that acts as a gateway between Node-red and Google Assistant.
 For this plugin I'm not using node-red but use the Nora server directly.
 This plugin is also based on the work done for the Pimatic-gBridge plugin. Because the gBridge service is stopped, this plugin will be a good replacement.
 
@@ -14,14 +14,17 @@ Before you can configure the plugin you need to get a Nora service token. The st
 
 - Go to the [NORA homepage](https://node-red-google-home.herokuapp.com/)
 - Login with your Google or Github account
-- Copy the generated token in your clipboard, to be used later in the plugin
+- Copy the generated token in your clipboard, to be used later in the device config of the plugin.
 
+Link Nora to your Google Home via the Google Home app (these steps need to happen only once).
+The steps are:
+- Open your Google Home app and click Add
+- In the Add and manage screen, select Set up device
+- Select Have something already set up?
+- Select NORA (in this image it's already linked) and login again with the Google/Github account you used when logging in to the NORA homepage.
 
-
-Link Nora to Google Home in the the Google Home app. (These steps need to happen only once)
-
-
-Devices are not exposed automatically to Nora and Google Assistant. You have to add them individually in the config.
+Done! Nora and Google Home are linked and you can install the plugin, add an Assistant device.
+Pimatic devices are not exposed automatically to Nora and Google Assistant. You have to add them individually in the device config.
 
 
 Installation
@@ -72,9 +75,12 @@ Device configuration
       auxiliary:            "adapter specific field to add functionality"
       auxiliary2:            "2nd adapter specific field to add functionality"
       twofa:                 "Two-step confirmation. Google Assistant will ask for confirmation"
-                              ["none", "ack"] default: "none"
+                              ["none", "ack", "pin"] default: "none"
+      pin:                  "when twofa "pin" is used, the pin string (default: '0000')"
 }
 ```
+#### Two-step confirmation
+2-step confirmation (twofa) is supported. When you anable twofa you can use "ack", the assistant will ask if you are sure you what to execute the action. When you enable "pin", Google Assistant will ask for the pin to confirm the action. You need to enter the pin via the 'keyboard'.
 
 #### Deleting an Assistant device
 Before you delete an Assistant device, please remove first all devices in the config and save the config. After that you can delete the Assistant device.

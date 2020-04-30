@@ -69,19 +69,5 @@ module.exports = (env) ->
     getState: () ->
       return @state
 
-    setTwofa: (_twofa) =>
-      @twoFa = _twofa
-
-    getTwoFa: () =>
-      _twoFa = null
-      switch @twoFa
-        when "ack"
-          _twoFa = "ack"
-        #when "pin"
-        #  _twoFa["used"] = true
-        #  _twoFa["method"] = "pin"
-        #  _twoFa["pin"] = String @twoFaPin
-      return _twoFa
-
     destroy: ->
       @device.removeListener "state", deviceStateHandler
