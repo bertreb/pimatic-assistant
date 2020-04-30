@@ -55,7 +55,7 @@ For the Shutter device the auxiliary field is used to control a shutter via a sh
 #### Thermostat
 For the HeatingThermostat you can add a temperature/humidity sensor. In the auxiliary field, add the device-id of the temperature/humidity sensor. The sensor needs to have 'temperature' and 'humidity' named attributes. If the attribute names are different, you can put a variables devices 'in between' (which converts the attribute names to 'temperature' and 'humidity').
 The heating device is only using the temperature setting of the device.
-The following modes are supported: off, heat and eco.
+The following modes are supported: off and heat.
 
 
 Device configuration
