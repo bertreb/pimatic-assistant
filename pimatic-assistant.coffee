@@ -108,6 +108,7 @@ module.exports = (env) ->
         devices = {}
         for _device, key in configDevices
           pimaticDevice = @devMgr.getDeviceById(_device.pimatic_device_id)
+          _newDevice = null
           if pimaticDevice?
             _adapterConfig =
               id: _device.pimatic_device_id
@@ -126,7 +127,7 @@ module.exports = (env) ->
                 brightnessControl: true
                 turnOnWhenBrightnessChanges: false
                 colorControl: true
-            else if (pimaticDevice.config.class).indexOf("RGB") >= 0
+            else if ((pimaticDevice.config.class).toLowerCase()).indexOf("rgb") >= 0
               env.logger.debug "Light device found"
               _newDevice = new lightColorAdapter(_adapterConfig)
               devices[_device.pimatic_device_id] = 
@@ -183,16 +184,18 @@ module.exports = (env) ->
             else
               env.logger.debug "Device type #{pimaticDevice.config.class} is not supported!"
 
-            devices[_device.pimatic_device_id]["type"] = _newDevice.getType()
-            devices[_device.pimatic_device_id]["name"] = _device.name
-            devices[_device.pimatic_device_id]["state"] = _newDevice.getState()
-            unless _device.twofa is "none"
-              devices[_device.pimatic_device_id]["twoFactor"] = _device.twofa
-              if _device.twofa is "pin"
-                devices[_device.pimatic_device_id]["pin"] = _device.pin ? "0000"
 
-            devices[_device.pimatic_device_id]["roomHint"] = _device.roomHint if _device.roomHint?
-            @handlers[_device.pimatic_device_id] = _newDevice
+            if _newDevice?
+              devices[_device.pimatic_device_id]["type"] = _newDevice.getType()
+              devices[_device.pimatic_device_id]["name"] = _device.name
+              devices[_device.pimatic_device_id]["state"] = _newDevice.getState()
+              unless _device.twofa is "none"
+                devices[_device.pimatic_device_id]["twoFactor"] = _device.twofa
+                if _device.twofa is "pin"
+                  devices[_device.pimatic_device_id]["pin"] = _device.pin ? "0000"
+
+              devices[_device.pimatic_device_id]["roomHint"] = _device.roomHint if _device.roomHint?
+              @handlers[_device.pimatic_device_id] = _newDevice
 
         resolve(devices)
       )
