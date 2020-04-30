@@ -20,8 +20,8 @@ Link Nora to your Google Home via the Google Home app (these steps need to happe
 The steps are:
 - Open your Google Home app and click Add
 - In the Add and manage screen, select Set up device
-- Select Have something already set up?
-- Select NORA (in this image it's already linked) and login again with the Google/Github account you used when logging in to the NORA homepage.
+- Select 'Have something already set up?'
+- Search and select 'NORA' and login again with the Google/Github account you used when logging in to the NORA homepage.
 
 Done! Nora and Google Home are linked and you can install the plugin, add an Assistant device.
 Pimatic devices are not exposed automatically to Nora and Google Assistant. You have to add them individually in the device config.
