@@ -5,6 +5,7 @@ module.exports = (env) ->
   switchAdapter = require('./adapters/switch')(env)
   lightAdapter = require('./adapters/light')(env)
   lightColorAdapter = require('./adapters/lightcolor')(env)
+  lightTemperatureAdapter = require('./adapters/lighttemperature')(env)
   lightColorMilightAdapter = require('./adapters/lightcolormilight')(env)
   buttonAdapter = require('./adapters/button')(env)
   shutterAdapter = require('./adapters/shutter')(env)
@@ -138,6 +139,12 @@ module.exports = (env) ->
                   brightnessControl: true
                   turnOnWhenBrightnessChanges: false
                   colorControl: true
+              when "lightTemperature"
+                _newDevice = new lightTemperatureAdapter(_adapterConfig)
+                devices[_device.pimatic_device_id] =
+                  brightnessControl: true
+                  turnOnWhenBrightnessChanges: false
+                  colorControl: false
               when "light"
                 _newDevice = new lightAdapter(_adapterConfig)
                 devices[_device.pimatic_device_id] =
@@ -198,8 +205,10 @@ module.exports = (env) ->
       _foundAdapter = null
       if pimaticDevice.config.class is "MilightRGBWZone" or pimaticDevice.config.class is "MilightFullColorZone"
         _foundAdapter = "lightColorMilight"
-      else if ((pimaticDevice.config.class).toLowerCase()).indexOf("rgb") >= 0 or ((pimaticDevice.config.class).toLowerCase()).indexOf("ct") >= 0
+      else if ((pimaticDevice.config.class).toLowerCase()).indexOf("rgb") >= 0
         _foundAdapter = "lightColor"
+      else if ((pimaticDevice.config.class).toLowerCase()).indexOf("ct") >= 0
+        _foundAdapter = "lightTemperature"
       else if (pimaticDevice.config.class).indexOf("Dimmer") >= 0
         _foundAdapter = "light"
       else if (pimaticDevice.config.class).indexOf("Switch") >= 0
