@@ -35,7 +35,6 @@ module.exports = (env) ->
         '&group=' + encodeURIComponent(group)
 
       @socket = io(uri)
-      @connected = false
 
       deviceConfigDef = require("./device-config-schema")
       @framework.deviceManager.registerDeviceClass('AssistantDevice', {
@@ -49,6 +48,8 @@ module.exports = (env) ->
       #@config = config
       @id = @config.id
       @name = @config.name
+
+      if @_destroyed then return
 
       @_presence = lastState?.presence?.value or off
 
@@ -89,30 +90,26 @@ module.exports = (env) ->
         .then((syncDevices)=>
           @plugin.socket.emit('sync', syncDevices, 'req:sync')
           env.logger.debug "NORA - devices synced: " + JSON.stringify(syncDevices,null,2)
-          if _.size(syncDevices) < 1
-            @plugin.socket.disconnect()
-          else if not @plugin.connected
-            @plugin.socket.connect()
         )
       )
 
       @plugin.socket.on 'connect', () =>
+        @_setPresence(on)
         env.logger.debug "NORA - connected to Nora server"
-        @_setPresence(true)
-        @plugin.connected = true
 
-      @plugin.socket.on 'disconnect', =>
+      @plugin.socket.on 'disconnect', () =>
+        @_setPresence(off)
         env.logger.debug "NORA - disconnected from Nora server"
-        @_setPresence(false)
-        @plugin.connected = false
 
       @framework.on "deviceRemoved", (device) =>
         if _.find(@config.devices, (d) => d.pimatic_device_id == device.id)
           #throw new Error "Please remove device also in Assistant"
           env.logger.info "please remove device also in Assistant!"
 
-      if @plugin.connected then @_setPresence(true) else @_setPresence(false)
-
+      if @plugin.socket.connected
+        @_setPresence(on)
+      else
+        @_setPresence(off)
 
       super()
 

@@ -4,5 +4,6 @@
 	* initial release
 * 20200501, v0.0.5
 	* added check on existing device and supported class
-* 20200501, v0.0.10
+* 20200501, v0.0.11
 	* moved token to plugin config
+	* presence dot for connected to Nora
