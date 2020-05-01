@@ -5,7 +5,6 @@ module.exports = (env) ->
   switchAdapter = require('./adapters/switch')(env)
   lightAdapter = require('./adapters/light')(env)
   lightColorAdapter = require('./adapters/lightcolor')(env)
-  lightTemperatureAdapter = require('./adapters/lighttemperature')(env)
   lightColorMilightAdapter = require('./adapters/lightcolormilight')(env)
   buttonAdapter = require('./adapters/button')(env)
   shutterAdapter = require('./adapters/shutter')(env)
@@ -26,6 +25,18 @@ module.exports = (env) ->
       pluginConfigDef = require './pimatic-assistant-config-schema'
       @configProperties = pluginConfigDef.properties
 
+      version = "0.0.34" # is latest node-red-nora-contrib version
+      notify = true
+      group = "pimatic"
+      uri = 'https://node-red-google-home.herokuapp.com/?' +
+        'version=' + version +
+        '&token=' + encodeURIComponent(@config.token) +
+        '&notify=' + notify +
+        '&group=' + encodeURIComponent(group)
+
+      @socket = io(uri)
+      @connected = false
+
       deviceConfigDef = require("./device-config-schema")
       @framework.deviceManager.registerDeviceClass('AssistantDevice', {
         configDef: deviceConfigDef.AssistantDevice,
@@ -38,7 +49,8 @@ module.exports = (env) ->
       #@config = config
       @id = @config.id
       @name = @config.name
-      @group = "pimatic"
+
+      @_presence = lastState?.presence?.value or off
 
       @devMgr = @framework.deviceManager
 
@@ -59,55 +71,55 @@ module.exports = (env) ->
           unless @selectAdapter(_fullDevice)?
             throw new Error "Pimatic device class '#{_fullDevice.config.class}' is not supported"
 
-      version = "0.0.34" # is latest node-red-nora-contrib version
-      notify = true
-      uri = 'https://node-red-google-home.herokuapp.com/?' +
-        'version=' + version +
-        '&token=' + encodeURIComponent(@config.token) +
-        '&notify=' + notify +
-        '&group=' + encodeURIComponent(@group)
+      @plugin.socket.on 'update', (changes) =>
+        env.logger.debug "NORA - update received " + JSON.stringify(changes,null,2)
+        @handleUpdate(changes)
+        .then((result)=>
+        )
 
-        @socket = io(uri)
+      @plugin.socket.on 'action-error', (reqId, msg) =>
+        env.logger.debug "NORA - action-error received, reqId " + reqId + ", msg: " + JSON.stringify(msg,null,2)
 
-        @socket.on 'connect', () =>
-          env.logger.debug "NORA - connected to Nora server"
-          @_setPresence(true)
-          @getSyncDevices(@configDevices)
-          .then((syncDevices)=>
-            @socket.emit('sync', syncDevices, 'req:sync')
-            env.logger.debug "NORA - devices synced: " + JSON.stringify(syncDevices,null,2)
-            if _.size(@configDevices) is 0
-              @socket.disconnect()
-          )
+      @plugin.socket.on 'activate-scene', (ids, deactivate) =>
+        env.logger.debug "NORA - activate-scene, ids " + JSON.stringify(ids,null,2) + ", deactivate: " + deactivate
 
-        @socket.on 'disconnect', =>
-          env.logger.debug "NORA - disconnected from Nora server"
-          @_setPresence(false)
+      @framework.variableManager.waitForInit()
+      .then(()=>
+        @getSyncDevices(@configDevices)
+        .then((syncDevices)=>
+          @plugin.socket.emit('sync', syncDevices, 'req:sync')
+          env.logger.debug "NORA - devices synced: " + JSON.stringify(syncDevices,null,2)
+          if _.size(@config.devices) is 0
+            @plugin.socket.disconnect()
+          else if not @plugin.connected
+            @plugin.socket.connect()
+        )
+      )
 
-        @socket.on 'update', (changes) =>
-          env.logger.debug "NORA - update received " + JSON.stringify(changes,null,2)
-          @handleUpdate(changes)
-          .then((result)=>
-          )
+      @plugin.socket.on 'connect', () =>
+        env.logger.debug "NORA - connected to Nora server"
+        @_setPresence(true)
+        @plugin.connected = true
 
-        @socket.on 'action-error', (reqId, msg) =>
-          env.logger.debug "NORA - action-error received, reqId " + reqId + ", msg: " + JSON.stringify(msg,null,2)
-
-        @socket.on 'activate-scene', (ids, deactivate) =>
-          env.logger.debug "NORA - activate-scene, ids " + JSON.stringify(ids,null,2) + ", deactivate: " + deactivate
-
+      @plugin.socket.on 'disconnect', =>
+        env.logger.debug "NORA - disconnected from Nora server"
+        @_setPresence(false)
+        @plugin.connected = false
 
       @framework.on "deviceRemoved", (device) =>
         if _.find(@config.devices, (d) => d.pimatic_device_id == device.id)
           #throw new Error "Please remove device also in Assistant"
           env.logger.info "please remove device also in Assistant!"
 
+      if @plugin.connected then @_setPresence(true) else @_setPresence(false)
+
+
       super()
 
     updateState: (id, newState) =>
       _a = {}
       _a[id] = newState
-      @socket.emit('update', _a, "req:" + id)
+      @plugin.socket.emit('update', _a, "req:" + id)
 
 
     getSyncDevices: (configDevices) =>
@@ -207,8 +219,6 @@ module.exports = (env) ->
         _foundAdapter = "lightColorMilight"
       else if ((pimaticDevice.config.class).toLowerCase()).indexOf("rgb") >= 0
         _foundAdapter = "lightColor"
-      else if ((pimaticDevice.config.class).toLowerCase()).indexOf("ct") >= 0
-        _foundAdapter = "lightTemperature"
       else if (pimaticDevice.config.class).indexOf("Dimmer") >= 0
         _foundAdapter = "light"
       else if (pimaticDevice.config.class).indexOf("Switch") >= 0
@@ -233,10 +243,10 @@ module.exports = (env) ->
       )
 
     destroy: ->
-      if @socket?
-        @socket.disconnect()
-        @socket.removeAllListeners()
-      @_setPresence(false)
+      if @plugin.socket?
+      #  @socket.disconnect()
+         @plugin.socket.removeAllListeners()
+      #@_setPresence(false)
       super()
 
 

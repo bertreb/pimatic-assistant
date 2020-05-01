@@ -83,7 +83,7 @@ module.exports = (env) ->
       hueMilight = (256 + 176 - Math.floor(Number(change.color.spectrumHsv.hue) / 360.0 * 255.0)) % 256
       #hsv =[hueMilight,change.color.spectrumHsv.saturation,change.color.spectrumHsv.value]
       #color = Color(hsv).hex()
-      env.logger.info "hueMilight = " + hueMilight
+      #env.logger.info "hueMilight = " + hueMilight
       @device.changeHueTo(hueMilight)
 
     updateState: (newState) =>

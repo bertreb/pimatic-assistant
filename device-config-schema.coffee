@@ -5,9 +5,6 @@ module.exports = {
     type: "object"
     extensions: ["xLink", "xAttributeOptions"]
     properties:
-      token:
-        description: "the NORA token"
-        type: "string"
       devices:
         description: "list of devices connected to Google Assistant"
         format: "table"
