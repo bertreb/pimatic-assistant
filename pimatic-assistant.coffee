@@ -89,7 +89,7 @@ module.exports = (env) ->
         .then((syncDevices)=>
           @plugin.socket.emit('sync', syncDevices, 'req:sync')
           env.logger.debug "NORA - devices synced: " + JSON.stringify(syncDevices,null,2)
-          if _.size(@configDevices) is 0
+          if _.size(syncDevices) < 1
             @plugin.socket.disconnect()
           else if not @plugin.connected
             @plugin.socket.connect()
