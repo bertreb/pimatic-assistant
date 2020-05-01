@@ -41,7 +41,7 @@ module.exports = (env) ->
       @twoFaPin = adapterConfig.twoFaPin
 
       @stateAvavailable = @device.hasAction("changeStateTo")
-      env.logger.info "HasAction state " + @stateAvavailable 
+      #env.logger.info "HasAction state " + @stateAvavailable 
 
       @device.on 'state', deviceStateHandler if @stateAvavailable
       @device.on 'dimlevel', deviceDimlevelHandler
