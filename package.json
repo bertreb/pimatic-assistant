@@ -13,6 +13,7 @@
     "device-config-schema.coffee",
     "adapters/light.coffee",
     "adapters/lightcolor.coffee",
+    "adapters/lighttemperature.coffee",
     "adapters/lightcolormilight.coffee",
     "adapters/switch.coffee",
     "adapters/button.coffee",
