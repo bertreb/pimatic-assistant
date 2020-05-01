@@ -36,7 +36,8 @@ To enable the Assistant plugin add this to the plugins section via the GUI or ad
 ```
 {
   plugin: "assistant"
-  debug: "Debug mode. Writes debug messages to the pimatic log."
+  token:  "The token from Nora"
+  debug:  "Debug mode. Writes debug messages to the pimatic log."
 }
 ```
 
@@ -65,7 +66,6 @@ Device configuration
 {
   "id": "<assistant-device-id>",
   "class": "AssistantDevice",
-    token:    "The token from Nora"
     devices:  "list of devices connected to Google Assistant"
       name:                 "the device name, and command used in Google Assistant"
       roomHint:             "the optional roomname used in Google Assistant"
@@ -79,7 +79,7 @@ Device configuration
 }
 ```
 #### Two-step confirmation
-2-step confirmation (twofa) is supported. When you anable twofa you can use "ack", the assistant will ask if you are sure you what to execute the action. When you enable "pin", Google Assistant will ask for the pin to confirm the action. You need to enter the pin via the 'keyboard'.
+2-step confirmation (twofa) is supported. When you enable twofa you can use "ack", the assistant will ask if you are sure you what to execute the action. When you enable "pin", Google Assistant will ask for the pin to confirm the action. You need to enter the pin via the 'keyboard'.
 
 #### Deleting an Assistant device
 Before you delete an Assistant device, please remove first all devices in the Assistant device config and save the config. After that you can delete the Assistant device.
