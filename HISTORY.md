@@ -7,3 +7,5 @@
 * 20200501, v0.0.11
 	* moved token to plugin config
 	* presence dot for connected to Nora
+* 20200501, v0.0.12
+	* edit and fix

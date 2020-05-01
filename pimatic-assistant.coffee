@@ -94,11 +94,11 @@ module.exports = (env) ->
       )
 
       @plugin.socket.on 'connect', () =>
-        @_setPresence(on)
+        @_setPresence(yes)
         env.logger.debug "NORA - connected to Nora server"
 
       @plugin.socket.on 'disconnect', () =>
-        @_setPresence(off)
+        @_setPresence(no)
         env.logger.debug "NORA - disconnected from Nora server"
 
       @framework.on "deviceRemoved", (device) =>
@@ -106,10 +106,7 @@ module.exports = (env) ->
           #throw new Error "Please remove device also in Assistant"
           env.logger.info "please remove device also in Assistant!"
 
-      if @plugin.socket.connected
-        @_setPresence(on)
-      else
-        @_setPresence(off)
+      if @plugin.socket.connected then @_setPresence(true) else @_setPresence(false)
 
       super()
 
@@ -240,10 +237,8 @@ module.exports = (env) ->
       )
 
     destroy: ->
-      if @plugin.socket?
-      #  @socket.disconnect()
-         @plugin.socket.removeAllListeners()
-      #@_setPresence(false)
+      #if @plugin.socket?
+      #  #@plugin.socket.removeAllListeners()
       super()
 
 
