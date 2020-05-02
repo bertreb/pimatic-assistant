@@ -28,13 +28,15 @@ module.exports = (env) ->
       @device = adapterConfig.pimaticDevice
       @subDeviceId = adapterConfig.pimaticSubDeviceId
       @UpdateState = adapterConfig.updateState
+      @lastBrightness = 0
 
       @twoFa = adapterConfig.twoFa
       @twoFaPin = adapterConfig.twoFaPin
 
-      @stateAvavailable = @device.hasAction("changeStateTo")
+      @stateAvailable = @device.hasAction("changeStateTo")    
+      @turnOnOffAvailable = @device.hasAction("turnOn") and @device.hasAction("turnOff")
     
-      @device.on 'state', deviceStateHandler if @stateAvavailable
+      @device.on 'state', deviceStateHandler if @stateAvailable
       @device.on 'dimlevel', deviceDimlevelHandler
       @device.system = @
 
@@ -50,6 +52,7 @@ module.exports = (env) ->
         )
         .then((dimlevel)=>
           @state.brightness = dimlevel
+          @lastBrightness = dimlevel
           @UpdateState(@id, @state)
         )
       else
@@ -73,8 +76,16 @@ module.exports = (env) ->
       env.logger.debug "Received action, change: " + JSON.stringify(change,null,2)
       @state.on = change.on
       @state.brightness = change.brightness
-      @device.changeStateTo(change.on) if @stateAvavailable
-      @device.changeDimlevelTo(change.brightness)
+      if @stateAvavailable
+        @device.changeStateTo(change.on)
+      else if @turnOnOffAvailable
+        if change.on
+          @device.turnOn()
+          if change.brightness > 0
+            @device.changeDimlevelTo(change.brightness)
+        else 
+          @device.turnOff()
+          #@device.changeDimlevelTo(change.brightness)
 
     updateState: (newState) =>
       unless newState is @state.on
@@ -84,7 +95,7 @@ module.exports = (env) ->
 
     updateDimlevel: (newDimlevel) =>
       unless newDimlevel is @state.brightness
-        env.logger.debug "Update state to " + newDimlevel
+        env.logger.debug "Update dimlevel to " + newDimlevel
         @state.brightness = newDimlevel
         @UpdateState(@id, @state)
 

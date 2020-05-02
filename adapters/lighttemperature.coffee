@@ -2,7 +2,7 @@ module.exports = (env) ->
   Promise = env.require 'bluebird'
   assert = env.require 'cassert'
   events = require 'events'
-  Color = require 'color'
+  Chroma = require 'chroma-js'
 
   class LightTemperatureAdapter extends events.EventEmitter
 
@@ -48,15 +48,18 @@ module.exports = (env) ->
       @device.on 'ct', deviceCTHandler #(0-254 color, 255 is white)
       @device.system = @
 
+      _hsvWarmWhite = Chroma.temperature(2600).hsv()
       @state =
         online: true
         on: false
         brightness: 0
         color:
           spectrumHsv:
-            hue: 0
-            saturation: 0
-            value: 1
+            hue: _hsvWarmWhite[0]
+            saturation: _hsvWarmWhite[1]
+            value: _hsvWarmWhite[2]
+
+
 
       #@publishState()
 
@@ -78,42 +81,11 @@ module.exports = (env) ->
       @state.on = change.on
       @state.brightness = change.brightness
       @state.color = change.color
-      @device.changeStateTo(change.on) if @stateAvavailable
+      _ct = Chroma.hsv(change.color.spectrumHsv.hue, change.color.spectrumHsv.saturation, change.color.spectrumHsv.value).temperature()
+      _ct2 = 100-100*(_ct-2000)/(4500)
+      @device.setCT(_ct2)
       @device.changeDimlevelTo(change.brightness)
-      #hueMilight = (256 + 176 - Math.floor(Number(change.color.spectrumHsv.hue) / 360.0 * 255.0)) % 256
-      hsv =[change.color.spectrumHsv.hue, change.color.spectrumHsv.saturation, change.color.spectrumHsv.value]
-      _xy = Color(hsv).xy()
-      _ct = @xyY_to_kelvin(_xy)
-
-      env.logger.debug "ct = " + _ct
-      @device.setCT(_ct)
-
-    xyY_to_kelvin = (x, y) ->
-      n = (x-0.3320) / (y-0.1858)
-      kelvin = parseInt((-449*n**3 + 3525*n**2 - 6823.3*n + 5520.33) + 0.5)
-
-    kelvin_to_xy = (T) ->
-      # Source https://en.wikipedia.org/wiki/Planckian_locus#Approximation
-      # and http://fcam.garage.maemo.org/apiDocs/_color_8cpp_source.html
-      if T <= 4000
-        x = -0.2661239*(10**9)/T**3 - 0.2343589*(10**6)/T**2 + 0.8776956*(10**3)/T + 0.17991
-      else if T <= 25000
-        x = -3.0258469*(10**9)/T**3 + 2.1070379*(10**6)/T**2 + 0.2226347*(10**3)/T + 0.24039
-
-      if T <= 2222
-        y = -1.1063814*x**3 - 1.3481102*x**2 + 2.18555832*x - 0.20219683
-      else if T <= 4000
-        y = -0.9549476*x**3 - 1.37418593*x**2 + 2.09137015*x - 0.16748867
-      else if T <= 25000
-        y = 3.081758*x**3 - 5.8733867*x**2 + 3.75112997*x - 0.37001483
-
-      xr = x*65535+0.5
-      yr = y*65535+0.5
-
-      [
-        x
-        y
-      ]
+      @device.changeStateTo(change.on) if @stateAvavailable
 
     updateState: (newState) =>
       unless newState is @state.on
@@ -128,13 +100,13 @@ module.exports = (env) ->
         @UpdateState(@id, @state)
 
     updateCT: (newCT)=>
-      hsv =[@state.color.spectrumHsv.hue, @state.color.spectrumHsv.saturation, @state.color.spectrumHsv.value]
-      _xy = Color(hsv).xy()
-      _ct = @xyY_to_kelvin(_xy)
-      unless newCT is _ct
-        env.logger.debug "Update ct to " + newCT
-        _newXy = kelvin_to_xy(newCT)
-        _hsv = Color(_newXy).hsv()
+      #if newCT < 2000 or newCT > 7000 or not newCT? then return
+      #env.logger.debug "raw newCT: " + newCT
+      _newCT = 6500-4500*newCT/100
+      _ct = Chroma.hsv(@state.color.spectrumHsv.hue, @state.color.spectrumHsv.saturation, @state.color.spectrumHsv.value).temperature()
+      unless _newCT is _ct
+        env.logger.debug "Update ct to " + _newCT
+        _hsv = Chroma.temperature(_newCT).hsv()
         env.logger.debug "Convert to hsv: " + _hsv
         @state.color.spectrumHsv.hue = _hsv[0]
         @state.color.spectrumHsv.saturation = _hsv[1]

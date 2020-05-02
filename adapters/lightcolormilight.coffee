@@ -2,7 +2,7 @@ module.exports = (env) ->
   Promise = env.require 'bluebird'
   assert = env.require 'cassert'
   events = require 'events'
-  Color = require 'color'
+  Chroma = require 'chroma-js'
 
   class LightColorMilightAdapter extends events.EventEmitter
 

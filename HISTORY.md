@@ -9,3 +9,6 @@
 	* presence dot for connected to Nora
 * 20200501, v0.0.12
 	* edit and fix
+* 20200502, v0.0.13
+	* update socket handling
+	* color handling with chroma-js
