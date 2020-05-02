@@ -47,7 +47,7 @@ After the plugin is installed an Assistant device can be added. When you add/rem
 
 Below the settings with the default values. In the devices your configure which Pimatic devices will be controlled by Google Assistant and what name they get. The name is visible in the Google Assistant and is the name you use in voice commands.
 In this release the SwitchActuator, DimmerActuator, ButtonsDevice, ShutterController, Milight (RGBWZone and FullColorZone) and HeatingThermostat based Pimatic devices are supported.
-When connected to the Nora server the dot will go to present.
+When there's at least 1 device added, the connection to Nora is made. When connected the dot will go to present.
 
 Some specific configurations:
 #### Shutter
