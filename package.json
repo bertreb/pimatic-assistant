@@ -13,6 +13,7 @@
     "device-config-schema.coffee",
     "adapters/light.coffee",
     "adapters/lightcolor.coffee",
+    "adapters/lighttemperature.coffee",
     "adapters/lightcolormilight.coffee",
     "adapters/switch.coffee",
     "adapters/button.coffee",
@@ -28,7 +29,7 @@
     "google",
     "assistant"
   ],
-  "version": "0.0.13",
+  "version": "0.0.14",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bertreb/pimatic-assistant.git"
