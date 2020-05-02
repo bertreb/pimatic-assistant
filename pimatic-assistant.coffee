@@ -169,7 +169,7 @@ module.exports = (env) ->
       @socket.emit('update', _a, "req:" + id)
 
     toGA = (id) ->
-      return id.replace('-','.')
+      return id.split('-').join('.')
 
     getSyncDevices: (configDevices) =>
       return new Promise((resolve,reject) =>
