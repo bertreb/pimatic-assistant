@@ -163,6 +163,8 @@ module.exports = (env) ->
       _a[id] = newState
       @socket.emit('update', _a, "req:" + id)
 
+    toGA = (id) ->
+      return id.replace('-','.')
 
     getSyncDevices: (configDevices) =>
       return new Promise((resolve,reject) =>
@@ -171,8 +173,9 @@ module.exports = (env) ->
           pimaticDevice = @devMgr.getDeviceById(_device.pimatic_device_id)
           _newDevice = null
           if pimaticDevice?
+            gaDeviceId = toGA(_device.pimatic_device_id)
             _adapterConfig =
-              id: _device.pimatic_device_id
+              id: gaDeviceId #_device.pimatic_device_id
               pimaticDevice: pimaticDevice
               updateState: @updateState
               pimaticSubDeviceId: _device.pimatic_subdevice_id
@@ -183,39 +186,39 @@ module.exports = (env) ->
             switch @selectAdapter(pimaticDevice)
               when "lightColorMilight"
                 _newDevice = new lightColorMilightAdapter(_adapterConfig)
-                devices[_device.pimatic_device_id] =
+                devices[gaDeviceId] =
                   brightnessControl: true
                   turnOnWhenBrightnessChanges: false
                   colorControl: true
               when "lightColor"
                 _newDevice = new lightColorAdapter(_adapterConfig)
-                devices[_device.pimatic_device_id] =
+                devices[gaDeviceId] =
                   brightnessControl: true
                   turnOnWhenBrightnessChanges: false
                   colorControl: true
               when "lightTemperature"
                 _newDevice = new lightTemperatureAdapter(_adapterConfig)
-                devices[_device.pimatic_device_id] =
+                devices[gaDeviceId] =
                   brightnessControl: true
                   turnOnWhenBrightnessChanges: false
                   colorControl: true
               when "light"
                 _newDevice = new lightAdapter(_adapterConfig)
-                devices[_device.pimatic_device_id] =
+                devices[gaDeviceId] =
                   brightnessControl: true
                   turnOnWhenBrightnessChanges: true
                   colorControl: false
               when "switch"
                 _newDevice = new switchAdapter(_adapterConfig)
-                devices[_device.pimatic_device_id] = {}
+                devices[gaDeviceId] = {}
               when "button"
                 _newDevice = new buttonAdapter(_adapterConfig)
-                devices[_device.pimatic_device_id] = {}
+                devices[gaDeviceId] = {}
               when "heatingThermostat"
                 @ambiantDevice = if _device.auxiliary? then @devMgr.getDeviceById(_device.auxiliary) else null
                 _adapterConfig["auxiliary"] = @ambiantDevice
                 _newDevice = new heatingThermostatAdapter(_adapterConfig)
-                devices[_device.pimatic_device_id] =
+                devices[gaDeviceId] =
                   temperatureUnit: "C"
                   bufferRangeCelsius: 2
                   commandOnlyTemperatureSetting: false
@@ -223,7 +226,7 @@ module.exports = (env) ->
                   availableModes: _newDevice.getModes()
               when "shutter"
                 _newDevice = new shutterAdapter(_adapterConfig)
-                devices[_device.pimatic_device_id] = {}
+                devices[gaDeviceId] = {}
 
                 ###
                 else if pimaticDevice instanceof env.devices.Sensor and pimaticDevice.hasAttribute('contact')
@@ -241,16 +244,16 @@ module.exports = (env) ->
 
 
             if _newDevice?
-              devices[_device.pimatic_device_id]["type"] = _newDevice.getType()
-              devices[_device.pimatic_device_id]["name"] = _device.name
-              devices[_device.pimatic_device_id]["state"] = _newDevice.getState()
+              devices[gaDeviceId]["type"] = _newDevice.getType()
+              devices[gaDeviceId]["name"] = _device.name
+              devices[gaDeviceId]["state"] = _newDevice.getState()
               unless _device.twofa is "none"
-                devices[_device.pimatic_device_id]["twoFactor"] = _device.twofa
+                devices[gaDeviceId]["twoFactor"] = _device.twofa
                 if _device.twofa is "pin"
-                  devices[_device.pimatic_device_id]["pin"] = _device.pin ? "0000"
+                  devices[gaDeviceId]["pin"] = _device.pin ? "0000"
 
-              devices[_device.pimatic_device_id]["roomHint"] = _device.roomHint if _device.roomHint?
-              @handlers[_device.pimatic_device_id] = _newDevice
+              devices[gaDeviceId]["roomHint"] = _device.roomHint if _device.roomHint?
+              @handlers[gaDeviceId] = _newDevice
 
         resolve(devices)
       )
