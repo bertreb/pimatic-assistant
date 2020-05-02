@@ -38,6 +38,7 @@ module.exports = (env) ->
 
       @socket = io(uri, {reconnection:true,reconnectionDelay:15000})
       ###
+      @initialized = false
 
       deviceConfigDef = require("./device-config-schema")
       @framework.deviceManager.registerDeviceClass('AssistantDevice', {
@@ -98,31 +99,35 @@ module.exports = (env) ->
       @socket.on 'activate-scene', (ids, deactivate) =>
         env.logger.debug "NORA - activate-scene, ids " + JSON.stringify(ids,null,2) + ", deactivate: " + deactivate
 
-      ###
-      @framework.variableManager.waitForInit()
-      .then(()=>
-        if @socket.connected
-          @getSyncDevices(@configDevices)
-          .then((syncDevices)=>
-            @socket.emit('sync', syncDevices, 'req:sync')
-            env.logger.debug "NORA - devices synced: " + JSON.stringify(syncDevices,null,2)
-          )
-      )
-      ###
-
-      @socket.on 'connect', () =>
+      @framework.on 'after init', () =>
         @_setPresence(yes)
         env.logger.debug "NORA - connected to Nora server"
         @getSyncDevices(@configDevices)
         .then((syncDevices)=>
           @socket.emit('sync', syncDevices, 'req:sync')
-          env.logger.debug "NORA - devices synced: " + JSON.stringify(syncDevices,null,2)
+          env.logger.debug "NORA - after init devices synced: " + JSON.stringify(syncDevices,null,2)
           if _.size(syncDevices)>0
             @_setPresence(true)
           else
             @socket.disconnect()
             @_setPresence(false)
         )
+        @plugin.initialized = true
+
+      @socket.on 'connect', () =>
+        if @plugin.initialized
+          @_setPresence(yes)
+          env.logger.debug "NORA - connected to Nora server"
+          @getSyncDevices(@configDevices)
+          .then((syncDevices)=>
+            @socket.emit('sync', syncDevices, 'req:sync')
+            env.logger.debug "NORA - devices synced: " + JSON.stringify(syncDevices,null,2)
+            if _.size(syncDevices)>0
+              @_setPresence(true)
+            else
+              @socket.disconnect()
+              @_setPresence(false)
+          )
 
       ###
       @socket.on 'reconnect', () =>
