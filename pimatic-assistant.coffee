@@ -38,7 +38,7 @@ module.exports = (env) ->
 
       @socket = io(uri, {reconnection:true,reconnectionDelay:15000})
       ###
-      @initialized = false
+      #@initialized = 0
 
       deviceConfigDef = require("./device-config-schema")
       @framework.deviceManager.registerDeviceClass('AssistantDevice', {
@@ -64,7 +64,7 @@ module.exports = (env) ->
         '&notify=' + notify +
         '&group=' + encodeURIComponent(group)
 
-      @socket = io(uri, {reconnectionDelay:20000, randomizationFactor:0.2})
+      @socket = io(uri, {autoConnect:false, reconnection:false}) #, reconnectionDelay:20000, randomizationFactor:0.2})
 
       @_presence = lastState?.presence?.value or off
 
@@ -99,7 +99,9 @@ module.exports = (env) ->
       @socket.on 'activate-scene', (ids, deactivate) =>
         env.logger.debug "NORA - activate-scene, ids " + JSON.stringify(ids,null,2) + ", deactivate: " + deactivate
 
+      ###
       @framework.on 'after init', () =>
+        unless @socket.connected then return
         @_setPresence(yes)
         env.logger.debug "NORA - connected to Nora server"
         @getSyncDevices(@configDevices)
@@ -112,22 +114,23 @@ module.exports = (env) ->
             @socket.disconnect()
             @_setPresence(false)
         )
-        @plugin.initialized = true
+        @plugin.initialized = 0
+      ###
 
+      #@plugin.initialized +=1
       @socket.on 'connect', () =>
-        if @plugin.initialized
-          @_setPresence(yes)
-          env.logger.debug "NORA - connected to Nora server"
-          @getSyncDevices(@configDevices)
-          .then((syncDevices)=>
-            @socket.emit('sync', syncDevices, 'req:sync')
-            env.logger.debug "NORA - devices synced: " + JSON.stringify(syncDevices,null,2)
-            if _.size(syncDevices)>0
-              @_setPresence(true)
-            else
-              @socket.disconnect()
-              @_setPresence(false)
-          )
+        @_setPresence(yes)
+        env.logger.debug "NORA - connected to Nora server"
+        @getSyncDevices(@configDevices)
+        .then((syncDevices)=>
+          @socket.emit('sync', syncDevices, 'req:sync')
+          env.logger.debug "NORA - devices synced: " + JSON.stringify(syncDevices,null,2)
+          if _.size(syncDevices)>0
+            @_setPresence(true)
+          else
+            @socket.disconnect()
+            @_setPresence(false)
+        )
 
       ###
       @socket.on 'reconnect', () =>
@@ -140,19 +143,40 @@ module.exports = (env) ->
         )
       ###
 
-      @socket.on 'connect_error', () =>
-        env.logger.debug "NORA - connect_error"
-      @socket.on 'reconnect_error', () =>
-        env.logger.debug "NORA - reconnect_error"
-      @socket.on 'reconnect_failed', () =>
-        env.logger.debug "NORA - reconnect_failed"
+      @socket.on 'connect_error', (err) =>
+        env.logger.debug "NORA - connect_error " + err
+      @socket.on 'reconnect_error', (err) =>
+        env.logger.debug "NORA - reconnect_error " + err
+      @socket.on 'reconnect_failed', (err) =>
+        env.logger.debug "NORA - reconnect_failed " + err
 
       @socket.on 'reconnecting', () =>
         env.logger.debug "Try to reconnect to Nora server..."
  
       @socket.on 'disconnect', () =>
-        @_setPresence(no)
+        @_setPresence(false)
         env.logger.debug "NORA - disconnected from Nora server"
+
+      @guardInterval = 15000
+      connectionGuard = () =>
+        #env.logger.debug "GUARD: connection status connected: " + @socket.connected
+        if @socket.connected is false
+          env.logger.debug "GUARD: Nora not connected, try to open connection"
+          @socket.open()
+        @connectionGuardTimer = setTimeout(connectionGuard, @guardInterval)
+      connectionGuard()
+
+      ###
+      pingPong = () =>
+        if @socket.connected
+          @socket.emit('ping')
+          env.logger.debug "Sending ping"
+        @pingPongTimer = setTimeout(pingPong, 60000)
+      @socket.on 'pong', (ms) =>
+        env.logger.debug "Received pong after ping #{ms} ms ago"
+      env.logger.debug "Starting ping - pong"
+      pingPong()
+      ###
 
       @framework.on "deviceRemoved", (device) =>
         if _.find(@config.devices, (d) => d.pimatic_device_id == device.id)
@@ -298,6 +322,7 @@ module.exports = (env) ->
       if @socket?
         @socket.disconnect()
         @socket.removeAllListeners()
+      clearTimeout(@connectionGuardTimer)
       super()
 
 
