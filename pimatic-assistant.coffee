@@ -53,19 +53,18 @@ module.exports = (env) ->
       @id = @config.id
       @name = @config.name
 
-      if @_destroyed then return
+      #if @_destroyed then return
 
       version = "0.0.34" # is latest node-red-nora-contrib version
       notify = true
       group = "pimatic"
-      uri = 'https://node-red-google-home.herokuapp.com/?' +
+      @uri = 'https://node-red-google-home.herokuapp.com/?' +
         'version=' + version +
         '&token=' + encodeURIComponent(@plugin.config.token) +
         '&notify=' + notify +
         '&group=' + encodeURIComponent(group)
 
-      @socket = io(uri, {autoConnect:false, reconnection:false}) #, reconnectionDelay:20000, randomizationFactor:0.2})
-
+ 
       @_presence = lastState?.presence?.value or off
 
       @devMgr = @framework.deviceManager
@@ -87,6 +86,41 @@ module.exports = (env) ->
           unless @selectAdapter(_fullDevice)?
             throw new Error "Pimatic device class '#{_fullDevice.config.class}' is not supported"
 
+      @initNoraConnection()
+
+
+      @framework.on "deviceRemoved", (device) =>
+        if _.find(@config.devices, (d) => d.pimatic_device_id == device.id)
+          #throw new Error "Please remove device also in Assistant"
+          env.logger.info "please remove device also in Assistant!"
+
+      if @socket.connected then @_setPresence(true) else @_setPresence(false)
+
+      super()
+
+    updateState: (id, newState) =>
+      _a = {}
+      _a[id] = newState
+      @socket.emit('update', _a, "req:" + id)
+
+    initNoraConnection: () =>
+
+      @socket = io(@uri, {autoConnect:true, reconnection:true, reconnectionDelay:20000, randomizationFactor:0.2})
+
+      @socket.on 'connect', () =>
+        @_setPresence(yes)
+        env.logger.debug "NORA - connected to Nora server"
+        @getSyncDevices(@configDevices)
+        .then((syncDevices)=>
+          @socket.emit('sync', syncDevices, 'req:sync')
+          env.logger.debug "NORA - after device start, devices synced: " + JSON.stringify(syncDevices,null,2)
+          if _.size(syncDevices)>0
+            @_setPresence(true)
+          else
+            @socket.disconnect()
+            @_setPresence(false)
+        )
+
       @socket.on 'update', (changes) =>
         env.logger.debug "NORA - update received " + JSON.stringify(changes,null,2)
         @handleUpdate(changes)
@@ -98,50 +132,6 @@ module.exports = (env) ->
 
       @socket.on 'activate-scene', (ids, deactivate) =>
         env.logger.debug "NORA - activate-scene, ids " + JSON.stringify(ids,null,2) + ", deactivate: " + deactivate
-
-      ###
-      @framework.on 'after init', () =>
-        unless @socket.connected then return
-        @_setPresence(yes)
-        env.logger.debug "NORA - connected to Nora server"
-        @getSyncDevices(@configDevices)
-        .then((syncDevices)=>
-          @socket.emit('sync', syncDevices, 'req:sync')
-          env.logger.debug "NORA - after init devices synced: " + JSON.stringify(syncDevices,null,2)
-          if _.size(syncDevices)>0
-            @_setPresence(true)
-          else
-            @socket.disconnect()
-            @_setPresence(false)
-        )
-        @plugin.initialized = 0
-      ###
-
-      #@plugin.initialized +=1
-      @socket.on 'connect', () =>
-        @_setPresence(yes)
-        env.logger.debug "NORA - connected to Nora server"
-        @getSyncDevices(@configDevices)
-        .then((syncDevices)=>
-          @socket.emit('sync', syncDevices, 'req:sync')
-          env.logger.debug "NORA - devices synced: " + JSON.stringify(syncDevices,null,2)
-          if _.size(syncDevices)>0
-            @_setPresence(true)
-          else
-            @socket.disconnect()
-            @_setPresence(false)
-        )
-
-      ###
-      @socket.on 'reconnect', () =>
-        @_setPresence(yes)
-        env.logger.debug "NORA - reconnected to Nora server"
-        @getSyncDevices(@configDevices)
-        .then((syncDevices)=>
-          @socket.emit('sync', syncDevices, 'req:sync')
-          env.logger.debug "NORA - devices synced: " + JSON.stringify(syncDevices,null,2)
-        )
-      ###
 
       @socket.on 'connect_error', (err) =>
         env.logger.debug "NORA - connect_error " + err
@@ -157,40 +147,19 @@ module.exports = (env) ->
         @_setPresence(false)
         env.logger.debug "NORA - disconnected from Nora server"
 
-      @guardInterval = 15000
+      @guardInterval = 300000
       connectionGuard = () =>
-        #env.logger.debug "GUARD: connection status connected: " + @socket.connected
-        if @socket.connected is false
-          env.logger.debug "GUARD: Nora not connected, try to open connection"
-          @socket.open()
-        @connectionGuardTimer = setTimeout(connectionGuard, @guardInterval)
-      connectionGuard()
+        env.logger.debug "GUARD: connection status connected: " + JSON.stringify(@socket.connected,null,2)
+        if not @socket? or @socket.connected is false
+          env.logger.debug "GUARD: Nora not connected, try to force re-connect"
+          @socket.close()
+          @socket.removeAllListeners()
+          @socket = null
+          @initNoraConnection()
+        else
+          @connectionGuardTimer = setTimeout(connectionGuard, @guardInterval)
+      @connectionGuardTimer = setTimeout(connectionGuard, @guardInterval)
 
-      ###
-      pingPong = () =>
-        if @socket.connected
-          @socket.emit('ping')
-          env.logger.debug "Sending ping"
-        @pingPongTimer = setTimeout(pingPong, 60000)
-      @socket.on 'pong', (ms) =>
-        env.logger.debug "Received pong after ping #{ms} ms ago"
-      env.logger.debug "Starting ping - pong"
-      pingPong()
-      ###
-
-      @framework.on "deviceRemoved", (device) =>
-        if _.find(@config.devices, (d) => d.pimatic_device_id == device.id)
-          #throw new Error "Please remove device also in Assistant"
-          env.logger.info "please remove device also in Assistant!"
-
-      if @socket.connected then @_setPresence(true) else @_setPresence(false)
-
-      super()
-
-    updateState: (id, newState) =>
-      _a = {}
-      _a[id] = newState
-      @socket.emit('update', _a, "req:" + id)
 
     toGA = (id) ->
       return id.split('-').join('.')
