@@ -14,5 +14,5 @@
 	* color handling with chroma-js
 	* added light color temperature
 	* update device id naming
-* 20200503, v0.0.19
+* 20200504, v0.0.20
 	* changed Nora connection handling

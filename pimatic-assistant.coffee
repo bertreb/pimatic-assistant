@@ -149,7 +149,7 @@ module.exports = (env) ->
 
       @guardInterval = 300000
       connectionGuard = () =>
-        env.logger.debug "GUARD: connection status connected: " + JSON.stringify(@socket.connected,null,2)
+        #env.logger.debug "GUARD: connection status connected: " + JSON.stringify(@socket.connected,null,2)
         if not @socket? or @socket.connected is false
           env.logger.debug "GUARD: Nora not connected, try to force re-connect"
           @socket.close()
