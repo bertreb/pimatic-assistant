@@ -92,6 +92,7 @@ Assistant Thermostat device
 The Assistant Thermostat device is a 'Dummy' device and supports several modes like 'heat, 'heatcool', 'cool' and 'eco'. With this device you can interface between Pimatic and Google Assistant for a maximum Thermostat experience. The Assistant Thermostat exposes several attributes and actions to be used in Pimatic.
 The device interfaces with a room temperature and humidity device and sets status for switching heater or cooler on.
 
+![device](https://github.com/bertreb/pimatic-assistant/blob/master/ui.png?raw=true)
 
 
 
