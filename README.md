@@ -97,4 +97,4 @@ The device interfaces with a room temperature and humidity device and sets statu
 
 -----------------
 
-The minumum node requiredment for this plugin is Node v8. You could backup Pimatic before you are using this plugin!
+The minimum node requirement for this plugin is Node v8. You could backup Pimatic before you are using this plugin!
