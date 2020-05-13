@@ -100,6 +100,7 @@ Features:
 - Eco mode
 - Usage of Pimatic device(s) for room temperature and humidity
 - Status attributes to be used for switcing on/off heater and cooler
+
 Planned:
 - Control Thermostat via rules (action part)
 - PID controller for heat and cool mode
