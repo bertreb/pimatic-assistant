@@ -100,10 +100,11 @@ Features:
 - Eco mode
 - Usage of Pimatic device(s) for room temperature and humidity
 - Status attributes to be used for switcing on/off heater and cooler
+Planned:
 - Control Thermostat via rules (action part)
-- X PID controller for heat and cool mode (tbd)
-- X Time before setpoint is reached (tbd)
-- X Scheduled mode (tbd)
+- PID controller for heat and cool mode
+- Time before setpoint is reached
+- Schedule mode
 -----------------
 
 The minimum node requirement for this plugin is Node v8. You could backup Pimatic before you are using this plugin!
