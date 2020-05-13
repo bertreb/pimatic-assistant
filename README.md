@@ -41,9 +41,11 @@ To enable the Assistant plugin add this to the plugins section via the GUI or ad
 }
 ```
 
+After the plugin is installed an Assistant device or an Assistant Thermostat device can be added.
+
 Assistant device
 -----------------
-After the plugin is installed an Assistant device can be added. When you add/remove a supported Pimatic device to the Assistant devicelist, the device is automatically added/removed in Nora and Google Assistant.
+The Assistant device is the main device for adding Pimatic devices to Google Assistant. When you add/remove a supported Pimatic device to the Assistant devicelist, the device is automatically added/removed in Nora and Google Assistant.
 
 Below the settings with the default values. In the devices your configure which Pimatic devices will be controlled by Google Assistant and what name they get. The name is visible in the Google Assistant and is the name you use in voice commands.
 In this release the SwitchActuator, DimmerActuator, ButtonsDevice, ShutterController, Milight (RGBWZone and FullColorZone) and HeatingThermostat based Pimatic devices are supported.
@@ -83,6 +85,15 @@ Device configuration
 
 #### Deleting an Assistant device
 Before you delete an Assistant device, please remove first all devices in the Assistant device config and save the config. After that you can delete the Assistant device.
+
+Assistant Thermostat device
+-----------------
+
+The Assistant Thermostat device is a 'Dummy' device and supports several modes like 'heat, 'heatcool', 'cool' and 'eco'. With this device you can interface between Pimatic and Google Assistant for a maximum Thermostat experience. The Assistant Thermostat exposes several attributes and actions to be used in Pimatic.
+The device interfaces with a room temperature and humidity device and sets status for switching heater or cooler on.
+
+
+
 
 -----------------
 
