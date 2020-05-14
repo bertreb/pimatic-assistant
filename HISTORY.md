@@ -16,3 +16,6 @@
 	* update device id naming
 * 20200504, v0.0.20
 	* changed Nora connection handling
+* 20200515, v0.1.0
+	* added Assistant Thermostat device
+	
