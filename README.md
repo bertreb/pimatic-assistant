@@ -94,15 +94,36 @@ The device interfaces with a room temperature and humidity device and sets statu
 
 ![device](https://github.com/bertreb/pimatic-assistant/blob/master/ui.png?raw=true)
 
+The Assistant Thermostat kan be controlled via rules. The action syntax is:
+
+```
+thermostat <assistant-thermostat-device id> [heat | heatcool | cool | eco | off | on | manual | schedule |
+  setpoint <temperature>[5-30] | setpointLow <temperature>[5-30] | setpointHigh <temperature>[5-30]
+```
+Commands explained:
+**heat**: enable heating function, setpoint is the target temperature
+**cool**: enable cooling function, setpoint is the target temperature
+heatcool: enable heatcool function. SetpointLow is the target temperature for heating and setpointHigh is the target temperature for cooling. The bufferRangeCelsius (device config) is the allowed difference between setpoint Low and High (buffer is the diffence). Heating starts when temperature is below setpointLow and cooling starts when temperature is above setpointHigh.
+**eco**: sets the attribute Eco (no logic yet)
+**off**: switches off the thermostat and switches heater and cooler off
+**on**: when thermostat is in 'off' state, with the 'on' command the previsous stae is restored
+**manual**: all function are manual (gui, rules or api) handled
+**schedule**: a schedule is active and all manual functions are still available
+**setpoint**: the target temperature for heating or cooling only mode
+**setpointLow: the target temperature for heating in 'heatcool' mode
+**setpointHigh: the target temperature for cooling in 'heatmode' mode
+
+In the gui the setpoint inputs are grayed out depending of the chosen mode.
+
 Features:
 - Setpoint for heating or cooling temperature
 - Heat-Cool mode with Low and High setpoint
 - Eco mode button
 - Usage of Pimatic device(s) for room temperature and humidity
 - Status attributes to be used for switching on/off heater and cooler
+- Control Thermostat via rules
 
 Planned:
-- Control Thermostat via rules
 - PID controller for heat and cool mode
 - Time before setpoint is reached
 - Scheduled mode
