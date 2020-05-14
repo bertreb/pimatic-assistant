@@ -136,7 +136,7 @@ The Assistant Thermostat can be controlled via rules. The action syntax is:
 
 ```
 thermostat <assistant-thermostat id> [heat | heatcool | cool | eco | off | on | manual | schedule |
-  setpoint <temperature>[5-30] | setpointLow <temperature>[5-30] | setpointHigh <temperature>[5-30]
+  setpoint [5-30] | setpointLow [5-30] | setpointHigh [5-30]
 ```
 Commands explained:
 
