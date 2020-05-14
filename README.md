@@ -97,15 +97,15 @@ The device interfaces with a room temperature and humidity device and sets statu
 Features:
 - Setpoint for heating or cooling temperature
 - Heat-Cool mode with Low and High setpoint
-- Eco mode button
 - Usage of Pimatic device(s) for room temperature and humidity
 - Status attributes to be used for switching on/off heater and cooler
 - Control Thermostat via rules
+- Eco and Manual/Schedule buttons
 
 Planned:
 - PID controller for heat and cool mode
-- Time before setpoint is reached
-- Scheduled mode
+- Estimated time before setpoint is reached
+- Schedule mode logic
 - Eco mode logic
 - Modes: Purifier, Fan-only, Dry
 
