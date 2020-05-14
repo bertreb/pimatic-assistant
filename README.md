@@ -14,7 +14,7 @@ The Plugin contains 2 types of devices.
 
 1. The first type is an Assistant Device that interfaces with Google Assistant via Nora. Pimatic devices are added in the config. The mapping of states and actions from Pimatic from/to Google Assistant is done as best as possible.
 2. The second type are Google Assistant optimized Pimatic dummy devices. These devices expose the maximum capabilities of Google Assistant to be used in Pimatic.
-The first device is the Assistant Thermostat.
+The first implemented device is the Assistant Thermostat.
 ------
 
 Before you can configure the plugin you need to get a Nora service token. The steps are:
