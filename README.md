@@ -3,16 +3,16 @@ Plugin for connecting a Pimatic system via Nora to Google Assistant
 
 Background
 -------
-The Assistant plugin lets you connect a Pimatic home automation system with a Google assistant via Nora.
+The Assistant plugin lets you connect a Pimatic home automation system to a Google assistant via Nora.
 
 
 Nora is a **NO**de-**R**ed home **A**utomation solution for connecting Node-red to Google Home/Assistant. Nora is build by [Andrei Tatar](https://github.com/andrei-tatar). Nora consists of a plugin for Node-red and the Nora backend server that acts as a gateway between Node-red and Google Assistant.
 For this plugin I'm not using node-red but use the Nora backend server directly.
 This plugin is also based on the work done for the Pimatic-gBridge plugin. Because the gBridge service is stopped, this plugin will be a good replacement.
 
-This Plugin contains 2 types of devices.
+The Plugin contains 2 types of devices.
 
-1. The first type is a Assistant Device that interfaces with Google Assistant via Nora. Pimatic devices are added in the config. The mapping of states and actions from Pimatic from/to Google Assistant is done as best as possible.
+1. The first type is an Assistant Device that interfaces with Google Assistant via Nora. Pimatic devices are added in the config. The mapping of states and actions from Pimatic from/to Google Assistant is done as best as possible.
 2. The second type are Google Assistant optimized Pimatic dummy devices. These devices expose the maximum capabilities of Google Assistant to be used in Pimatic.
 The first device is the Assistant Thermostat.
 ------
