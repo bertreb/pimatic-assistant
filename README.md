@@ -114,7 +114,7 @@ Commands explained:
 - **setpointLow**: the target temperature for heating in 'heatcool' mode
 - **setpointHigh**: the target temperature for cooling in 'heatmode' mode
 
-In the gui the setpoint inputs are grayed out depending of the chosen mode.
+In the gui the setpoint inputs are grayed out depending of the chosen mode (heat/cool or heatcool)
 
 Features:
 - Setpoint for heating or cooling temperature
