@@ -17,19 +17,8 @@ module.exports = (env) ->
       @twoFa = adapterConfig.twoFa
       @twoFaPin = adapterConfig.twoFaPin
 
-      ###
-      GA Thermostat modes 
-      "off", "cool", "auto", "eco", "heat", 
-      "heatcool", "fan-only", "heat", "on", "purifier"
-      mapping
-      off -> off
-      eco <-> eco
-      auto <-> auto
-      manu <-> on
-      boost <-> on
-      ###
-
       @modes = ["off","heat"]
+      #@modes = ["off", "on", cool", "auto", "eco", "heat", "heatcool", "fan-only", "heat", "purifier"]
 
       @state =
         online: true

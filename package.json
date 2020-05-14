@@ -17,8 +17,9 @@
     "adapters/lightcolormilight.coffee",
     "adapters/switch.coffee",
     "adapters/button.coffee",
-    "adapters/shutter.coffee",
+    "adapters/blinds.coffee",
     "adapters/heatingthermostat.coffee",
+    "adapters/assistantthermostat.coffee",
     "README.md",
     "LICENSE"
   ],
