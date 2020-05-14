@@ -6,7 +6,7 @@ module.exports = {
     extensions: ["xLink", "xAttributeOptions"]
     properties:
       devices:
-        description: "list of devices connected to Google Assistant"
+        description: "list of  devices connected to Google Assistant"
         format: "table"
         type: "array"
         default: []
@@ -39,5 +39,37 @@ module.exports = {
               description: "The pin for Two-step pin confirmation. Google Assistant will ask for confirmation"
               type: "string"
               default: "0000"
+  }
+  AssistantThermostat: {
+    title: "AssistantThermostat config options"
+    type: "object"
+    extensions: ["xLink", "xAttributeOptions"]
+    properties:
+      minThresholdCelsius:
+        description: "supported minimum temperature range for this device (in degrees Celsius)"
+        type: "number"
+        default: 5
+      maxThresholdCelsius:
+        description: "supported maximum temperature range for this device (in degrees Celsius)"
+        type: "number"
+        default: 30
+      thermostatTemperatureUnit:
+        description: "The unit the device is set to by default"
+        enum: ["C","F"]
+        default: "C"
+      bufferRangeCelsius:
+        description: "Specifies the minimum offset between heat-cool setpoints in Celsius, if heatcool mode is supported"
+        type: "number"
+        default: 2
+      temperatureDevice:
+        description: "The Pimatic device.temperature id for the thermostat room temperature"
+        type: "string"
+      humidityDevice:
+        description: "The Pimatic device.humidity id for the thermostat room humidity"
+        type: "string"
+      pid:
+        description: "Enable the PID controller for heater and cooler"
+        type: "boolean"
+        default: false
   }
 }
