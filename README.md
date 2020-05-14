@@ -112,8 +112,7 @@ Commands explained:
 - **schedule**: a schedule is active and all manual functions are still available
 - **setpoint**: the target temperature for heating or cooling only mode
 - **setpointLow**: the target temperature for heating in 'heatcool' mode
-
-**setpointHigh**: the target temperature for cooling in 'heatmode' mode
+- **setpointHigh**: the target temperature for cooling in 'heatmode' mode
 
 In the gui the setpoint inputs are grayed out depending of the chosen mode.
 
