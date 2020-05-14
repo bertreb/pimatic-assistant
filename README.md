@@ -97,15 +97,17 @@ The device interfaces with a room temperature and humidity device and sets statu
 Features:
 - Setpoint for heating or cooling temperature
 - Heat-Cool mode with Low and High setpoint
-- Eco mode
+- Eco mode button with status
 - Usage of Pimatic device(s) for room temperature and humidity
-- Status attributes to be used for switcing on/off heater and cooler
+- Status attributes to be used for switching on/off heater and cooler
 
 Planned:
-- Control Thermostat via rules (action part)
+- Control Thermostat via rules
 - PID controller for heat and cool mode
 - Time before setpoint is reached
-- Schedule mode
+- Scheduled mode
+- Eco mode logic
+- Modes: Purifier, Fan-only, Dry
 -----------------
 
 The minimum node requirement for this plugin is Node v8. You could backup Pimatic before you are using this plugin!
