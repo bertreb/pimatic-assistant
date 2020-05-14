@@ -120,6 +120,8 @@ Device configuration
 
 ```
 {
+  id:                         "<assistant-thermostat-device-id>"
+  class:                      "AssistantThermostat"
   minThresholdCelsius:        "supported minimum temperature range for this device (in degrees Celsius)"
   maxThresholdCelsius:        "supported maximum temperature range for this device (in degrees Celsius)"
   thermostatTemperatureUnit:  "The unit the device is set to by default (C)"
