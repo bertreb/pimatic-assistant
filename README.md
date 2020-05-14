@@ -120,7 +120,7 @@ Device configuration
 
 ```
 {
-  id:                         "<assistant-thermostat-device-id>"
+  id:                         "<assistant-thermostat-id>"
   class:                      "AssistantThermostat"
   minThresholdCelsius:        "supported minimum temperature range for this device (in degrees Celsius)"
   maxThresholdCelsius:        "supported maximum temperature range for this device (in degrees Celsius)"
