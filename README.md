@@ -71,8 +71,8 @@ Device configuration
 
 ```
 {
-  "id": "<assistant-device-id>",
-  "class": "AssistantDevice",
+  id:     "<assistant-device-id>"
+  class:  "AssistantDevice"
     devices:  "list of devices connected to Google Assistant"
       name:                 "the device name, and command used in Google Assistant"
       roomHint:             "the optional roomname used in Google Assistant"
