@@ -1,0 +1,22 @@
+
+.button-box-old {
+  border: 0px solid #ccc;
+  overflow: visible;
+  background-color: #fff;
+  display:inline-block;
+  box-shadow: 0 0 2px 2px rgb(247,247,247) /*{pm-items-shadow-color}*/;
+}
+.button-box {
+  overflow: visible;
+  display: inline-block;
+}
+.input-box {
+  float: left;
+  margin-left:1px;
+}
+.input-label {
+  font-size: 0.9em;
+  font-weight: bold;
+  margin-left: 5px;
+  display:inline-block;
+}

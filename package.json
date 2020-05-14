@@ -20,6 +20,9 @@
     "adapters/blinds.coffee",
     "adapters/heatingthermostat.coffee",
     "adapters/assistantthermostat.coffee",
+    "app/thermostat.coffee",
+    "app/thermostat.jade",
+    "app/thermostat.css",
     "README.md",
     "LICENSE"
   ],
