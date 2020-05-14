@@ -94,7 +94,22 @@ The device interfaces with a room temperature and humidity device and sets statu
 
 ![device](https://github.com/bertreb/pimatic-assistant/blob/master/ui.png?raw=true)
 
-The Assistant Thermostat kan be controlled via rules. The action syntax is:
+Device configuration
+-----------------
+
+```
+{
+  minThresholdCelsius:        "supported minimum temperature range for this device (in degrees Celsius)"
+  maxThresholdCelsius:        "supported maximum temperature range for this device (in degrees Celsius)"
+  thermostatTemperatureUnit:  "The unit the device is set to by default (C)"
+  bufferRangeCelsius:         "Specifies the minimum offset between heat-cool setpoints in Celsius, if heatcool mode is supported"
+  temperatureDevice:          "The Pimatic device id for the thermostat room temperature"
+  humidityDevice:             "The Pimatic device id for the thermostat room humidity"
+  pid:                        "Enable the PID controller for heater and cooler"
+}
+```
+
+The Assistant Thermostat can be controlled via rules. The action syntax is:
 
 ```
 thermostat <assistant-thermostat-device id> [heat | heatcool | cool | eco | off | on | manual | schedule |
