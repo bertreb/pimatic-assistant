@@ -97,7 +97,7 @@ The device interfaces with a room temperature and humidity device and sets statu
 Features:
 - Setpoint for heating or cooling temperature
 - Heat-Cool mode with Low and High setpoint
-- Eco mode button with status
+- Eco mode button
 - Usage of Pimatic device(s) for room temperature and humidity
 - Status attributes to be used for switching on/off heater and cooler
 
