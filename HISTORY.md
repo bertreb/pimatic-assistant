@@ -22,3 +22,5 @@
 	* fix waitforinit
 * 20200515, v0.1.3
 	* added outdoor temperature and humidity
+* 20200515, v0.1.4
+	* added 1 decimal place formatting of values

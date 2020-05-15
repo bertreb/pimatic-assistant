@@ -85,7 +85,7 @@ module.exports = (env) ->
         '&notify=' + notify +
         '&group=' + encodeURIComponent(group)
 
- 
+
       @_presence = lastState?.presence?.value or off
 
       @devMgr = @framework.deviceManager
@@ -167,7 +167,7 @@ module.exports = (env) ->
 
       @socket.on 'reconnecting', () =>
         env.logger.debug "Try to reconnect to Nora server..."
- 
+
       @socket.on 'disconnect', () =>
         @_setPresence(false)
         env.logger.debug "NORA - disconnected from Nora server"
@@ -508,10 +508,10 @@ module.exports = (env) ->
       @framework.variableManager.waitForInit()
       .then(()=>
         #the room sensors
-        @_temperatureRoomDevice = @config.temperatureRoom.replace("$","").trim()      
+        @_temperatureRoomDevice = @config.temperatureRoom.replace("$","").trim()
         @_temperatureRoomDevice = @_temperatureRoomDevice.split('.')
         if @_temperatureRoomDevice[0]?
-          @temperatureRoomDevice = @framework.deviceManager.getDeviceById(@_temperatureRoomDevice[0])     
+          @temperatureRoomDevice = @framework.deviceManager.getDeviceById(@_temperatureRoomDevice[0])
           unless @temperatureRoomDevice?
             throw new Error "Unknown temperature device '#{@temperatureDevice}'"
           @temperatureRoomAttribute = @_temperatureRoomDevice[1]
@@ -532,7 +532,7 @@ module.exports = (env) ->
         @_humidityRoomDevice = @config.humidityRoom.replace("$","").trim()
         @_humidityRoomDevice = @_humidityRoomDevice.split('.')
         if @_humidityRoomDevice[0]?
-          @humidityRoomDevice = @framework.deviceManager.getDeviceById(@_humidityRoomDevice[0])     
+          @humidityRoomDevice = @framework.deviceManager.getDeviceById(@_humidityRoomDevice[0])
           unless @humidityRoomDevice?
             throw new Error "Unknown humidity room device '#{@humidityRoomDevice}'"
           @humidityRoomAttribute = @_humidityRoomDevice[1]
@@ -551,10 +551,10 @@ module.exports = (env) ->
           @humidityRoomSensor = true
 
         # the outdoor sensors
-        @_temperatureOutdoorDevice = @config.temperatureOutdoor.replace("$","").trim()      
+        @_temperatureOutdoorDevice = @config.temperatureOutdoor.replace("$","").trim()
         @_temperatureOutdoorDevice = @_temperatureOutdoorDevice.split('.')
         if @_temperatureOutdoorDevice[0]?
-          @temperatureOutdoorDevice = @framework.deviceManager.getDeviceById(@_temperatureOutdoorDevice[0])     
+          @temperatureOutdoorDevice = @framework.deviceManager.getDeviceById(@_temperatureOutdoorDevice[0])
           unless @temperatureOutdoorDevice?
             throw new Error "Unknown temperature Outdoor device '#{@temperatureOutdoorDevice}'"
           @temperatureOutdoorAttribute = @_temperatureOutdoorDevice[1]
@@ -563,6 +563,7 @@ module.exports = (env) ->
           env.logger.debug "Temperature Outdoordevice found " + JSON.stringify(@temperatureOutdoorDevice.config,null,2)
           @attributes.temperatureOutdoor.hidden = false
           getter = 'get' + upperCaseFirst(@temperatureOutdoorAttribute)
+          env.logger.debug "Getter temperatureOutdoorDevice " + getter
           @temperatureOutdoorDevice[getter]()
           .then((temperatureOutdoor)=>
             env.logger.debug "Update temperature outdoor " + temperatureOutdoor
@@ -574,7 +575,7 @@ module.exports = (env) ->
         @_humidityOutdoorDevice = @config.humidityOutdoor.replace("$","").trim()
         @_humidityOutdoorDevice = @_humidityOutdoorDevice.split('.')
         if @_humidityOutdoorDevice[0]?
-          @humidityOutdoorDevice = @framework.deviceManager.getDeviceById(@_humidityOutdoorDevice[0])     
+          @humidityOutdoorDevice = @framework.deviceManager.getDeviceById(@_humidityOutdoorDevice[0])
           unless @humidityOutdoorDevice?
             throw new Error "Unknown humidity Outdoor device '#{@humidityOutdoorDevice}'"
           @humidityOutdoorAttribute = @_humidityOutdoorDevice[1]
@@ -595,16 +596,20 @@ module.exports = (env) ->
 
       super()
 
-    temperatureRoomHandler: (temperatureRoom) =>
+    temperatureRoomHandler: (_temperatureRoom) =>
+      temperatureRoom = Math.round(10*_temperatureRoom)/10
       @changeTemperatureRoomTo(temperatureRoom)
 
-    humidityRoomHandler: (humidityRoom) =>
+    humidityRoomHandler: (_humidityRoom) =>
+      humidityRoom = Math.round(10*_humidityRoom)/10
       @changeHumidityRoomTo(humidityRoom)
 
-    temperatureOutdoorHandler: (temperatureOutdoor) =>
+    temperatureOutdoorHandler: (_temperatureOutdoor) =>
+      temperatureOutdoor = Math.round(10*_temperatureOutdoor)/10
       @changeTemperatureOutdoorTo(temperatureOutdoor)
 
-    humidityOutdoorHandler: (humidityOutdoor) =>
+    humidityOutdoorHandler: (_humidityOutdoor) =>
+      humidityOutdoor = Math.round(10*_humidityOutdoor)/10
       @changeHumidityOutdoorTo(humidityOutdoor)
 
     getMode: () -> Promise.resolve(@_mode)
@@ -791,7 +796,7 @@ module.exports = (env) ->
       # check if pid -> enable pid
       @getPower()
       .then((power)=>
-        if power       
+        if power
           @getMode()
           .then((mode)=>
             switch mode
@@ -920,38 +925,38 @@ module.exports = (env) ->
           ((m) =>
             return m.match(' heat', (m)=>
               setCommand('heat')
-              match = m.getFullMatch()    
-            )            
+              match = m.getFullMatch()
+            )
           ),
           ((m) =>
             return m.match(' heatcool', (m)=>
               setCommand('heatcool')
               match = m.getFullMatch()
-            )             
+            )
           ),
           ((m) =>
             return m.match(' cool', (m)=>
               setCommand('cool')
               match = m.getFullMatch()
-            )             
+            )
           ),
           ((m) =>
             return m.match(' eco', (m)=>
               setCommand('eco')
               match = m.getFullMatch()
-            )           
+            )
           ),
           ((m) =>
             return m.match(' off', (m)=>
               setCommand('off')
               match = m.getFullMatch()
-            )              
+            )
           ),
           ((m) =>
             return m.match(' on', (m)=>
               setCommand('on')
               match = m.getFullMatch()
-            )              
+            )
           )
           ((m) =>
             return m.match(' setpoint ')
@@ -972,13 +977,13 @@ module.exports = (env) ->
                   return m.match(' manual', (m)=>
                     setCommand('manual')
                     match = m.getFullMatch()
-                  )              
+                  )
                 ),
                 ((m) =>
                   return m.match(' schedule', (m)=>
                     setCommand('schedule')
-                    match = m.getFullMatch() 
-                  )              
+                    match = m.getFullMatch()
+                  )
                 )
               ])
           )
