@@ -157,7 +157,7 @@ module.exports = (env) ->
       env.logger.debug "Received action, change: " + JSON.stringify(change,null,2)
       @state.thermostatMode = change.thermostatMode
       @state.thermostatTemperatureSetpoint = change.thermostatTemperatureSetpoint
-      @state.online = change.online
+      #@state.online = change.online
 
       switch change.thermostatMode
         when "heat"
