@@ -45,6 +45,26 @@ module.exports = {
     type: "object"
     extensions: ["xLink", "xAttributeOptions"]
     properties:
+      temperatureRoom:
+        description: "The Pimatic device.temperature id for the thermostat room temperature"
+        type: "string"
+        required: true
+      humidityRoom:
+        description: "The Pimatic device.humidity id for the thermostat room humidity"
+        type: "string"
+        required: false
+      temperatureOutdoor:
+        description: "The Pimatic device.temperature id for the outdoor temperature"
+        type: "string"
+        required: false
+      humidityOutdoor:
+        description: "The Pimatic device.humidity id for the outdoor humidity"
+        type: "string"
+        required: false
+      pid:
+        description: "Enable the PID controller for heater and cooler"
+        type: "boolean"
+        required: false
       minThresholdCelsius:
         description: "supported minimum temperature range for this device (in degrees Celsius)"
         type: "number"
@@ -61,21 +81,5 @@ module.exports = {
         description: "Specifies the minimum offset between heat-cool setpoints in Celsius, if heatcool mode is supported"
         type: "number"
         default: 2
-      temperatureRoom:
-        description: "The Pimatic device.temperature id for the thermostat room temperature"
-        type: "string"
-      humidityRoom:
-        description: "The Pimatic device.humidity id for the thermostat room humidity"
-        type: "string"
-      temperatureOutdoor:
-        description: "The Pimatic device.temperature id for the outdoor temperature"
-        type: "string"
-      humidityOutdoor:
-        description: "The Pimatic device.humidity id for the outdoor humidity"
-        type: "string"
-      pid:
-        description: "Enable the PID controller for heater and cooler"
-        type: "boolean"
-        default: false
   }
 }

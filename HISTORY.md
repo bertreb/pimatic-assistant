@@ -20,3 +20,5 @@
 	* added Assistant Thermostat device
 * 20200515, v0.1.2
 	* fix waitforinit
+* 20200515, v0.1.3
+	* added outdoor temperature and humidity
