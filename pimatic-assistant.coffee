@@ -368,11 +368,19 @@ module.exports = (env) ->
         params:
           program:
             type: "string"
-      changeTemperatureAmbiantTo:
+      changeTemperatureRoomTo:
         params:
           temperature:
             type: "number"
-      changeHumidityAmbiantTo:
+      changeHumidityRoomTo:
+        params:
+          humidity:
+            type: "number"
+      changeTemperatureOutdoorTo:
+        params:
+          temperature:
+            type: "number"
+      changeHumidityOutdoorTo:
         params:
           humidity:
             type: "number"
@@ -387,9 +395,11 @@ module.exports = (env) ->
       @_power = lastState?.power?.value or true
       @_eco = lastState?.eco?.value or false
       @_program = lastState?.program?.value or "manual"
-      @_temperatureAmbiant = lastState?.temperatureAmbiant?.value or 20
+      @_temperatureRoom = lastState?.temperatureRoom?.value or 20
+      @_humidityRoom = lastState?.humidityRoom?.value or 50
+      @_temperatureOutdoor = lastState?.temperatureOutdoor?.value or 20
+      @_humidityOutdoor = lastState?.humidityOutdoor?.value or 50
       @_timeToTemperatureSetpoint = lastState?.timeToTemperatureSetpoint?.value or 0
-      @_humidityAmbiant = lastState?.humidityAmbiant?.value or 50
       @_battery = lastState?.battery?.value or "ok"
       @_synced = true
       @_active = false
@@ -460,15 +470,25 @@ module.exports = (env) ->
           type: "number"
           unit: "sec"
           acronym: "time to setpoint"
-        temperatureAmbiant:
-          description: "The room temperatue of the thermostat"
+        temperatureRoom:
+          description: "The room temperature of the thermostat"
           type: "number"
           acronym: "T"
           unit: "°C"
-        humidityAmbiant:
+        humidityRoom:
           description: "The room humidity of the thermostat"
           type: "number"
           acronym: "H"
+          unit: "%"
+        temperatureOutdoor:
+          description: "The outdoor temperature of the thermostat"
+          type: "number"
+          acronym: "TO"
+          unit: "°C"
+        humidityOutdoor:
+          description: "The outdoor humidity of the thermostat"
+          type: "number"
+          acronym: "HO"
           unit: "%"
         battery:
           description: "Battery status"
@@ -482,50 +502,93 @@ module.exports = (env) ->
 
       @framework.variableManager.waitForInit()
       .then(()=>
-        @_temperatureDevice = @config.temperatureDevice.replace("$","").trim()      
-        @_temperatureDevice = @_temperatureDevice.split('.')
-        if @_temperatureDevice[0]?
-          @temperatureDevice = @framework.deviceManager.getDeviceById(@_temperatureDevice[0])     
-          unless @temperatureDevice?
+        #the room sensors
+        @_temperatureRoomDevice = @config.temperatureRoom.replace("$","").trim()      
+        @_temperatureRoomDevice = @_temperatureRoomDevice.split('.')
+        if @_temperatureRoomDevice[0]?
+          @temperatureRoomDevice = @framework.deviceManager.getDeviceById(@_temperatureRoomDevice[0])     
+          unless @temperatureRoomDevice?
             throw new Error "Unknown temperature device '#{@temperatureDevice}'"
-          @temperatureAttribute = @_temperatureDevice[1]
-          env.logger.info "@temperatureAttribute " + JSON.stringify(@temperatureAttribute,null,2)
-          unless @temperatureDevice.hasAttribute(@temperatureAttribute)
-            throw new Error "Unknown temperature attribute '#{@temperatureAttribute}'"
-          env.logger.debug "Temperature device found " + JSON.stringify(@temperatureDevice.config,null,2)
-          @temperatureDevice.getTemperature()
-          .then((temperatureAmbiant)=>
-            @changeTemperatureAmbiantTo(temperatureAmbiant)
+          @temperatureRoomAttribute = @_temperatureRoomDevice[1]
+          env.logger.info "@temperatureRoomAttribute " + JSON.stringify(@temperatureRoomAttribute,null,2)
+          unless @temperatureRoomDevice.hasAttribute(@temperatureRoomAttribute)
+            throw new Error "Unknown temperature room attribute '#{@temperatureRoomAttribute}'"
+          env.logger.debug "Temperature room device found " + JSON.stringify(@temperatureRoomDevice.config,null,2)
+          @temperatureRoomDevice.getTemperature()
+          .then((temperatureRoom)=>
+            @changeTemperatureRoomTo(temperatureRoom)
           )
-          @temperatureDevice.system = @
-          @temperatureDevice.on @temperatureAttribute, @temperatureHandler
-          @temperatureSensor = true
-        @_humidityDevice = @config.humidityDevice.replace("$","").trim()
-        @_humidityDevice = @_humidityDevice.split('.')
-        if @_humidityDevice[0]?
-          @humidityDevice = @framework.deviceManager.getDeviceById(@_humidityDevice[0])     
-          unless @humidityDevice?
-            throw new Error "Unknown humidity device '#{@humidityDevice}'"
-          @humidityAttribute = @_humidityDevice[1]
-          unless @humidityDevice.hasAttribute(@humidityAttribute)
-            throw new Error "Unknown humidity attribute '#{@humidityAttribute}'"
-          env.logger.debug "Temperature device found " + JSON.stringify(@humidityDevice.config,null,2)
-          @humidityDevice.getHumidity()
-          .then((humidityAmbiant)=>
-            @changeHumidityAmbiantTo(humidityAmbiant)
+          @temperatureRoomDevice.system = @
+          @temperatureRoomDevice.on @temperatureRoomAttribute, @temperatureRoomHandler
+          @temperatureRoomSensor = true
+        @_humidityRoomDevice = @config.humidityRoom.replace("$","").trim()
+        @_humidityRoomDevice = @_humidityRoomDevice.split('.')
+        if @_humidityRoomDevice[0]?
+          @humidityRoomDevice = @framework.deviceManager.getDeviceById(@_humidityRoomDevice[0])     
+          unless @humidityRoomDevice?
+            throw new Error "Unknown humidity room device '#{@humidityRoomDevice}'"
+          @humidityRoomAttribute = @_humidityRoomDevice[1]
+          unless @humidityRoomDevice.hasAttribute(@humidityRoomAttribute)
+            throw new Error "Unknown humidity attribute '#{@humidityRoomAttribute}'"
+          env.logger.debug "Humidity room device found " + JSON.stringify(@humidityRoomDevice.config,null,2)
+          @humidityRoomDevice.getHumidity()
+          .then((humidityRoom)=>
+            @changeHumidityRoomTo(humidityRoom)
           )
-          @humidityDevice.system = @
-          @humidityDevice.on @humidityAttribute, @humidityHandler
-          @humiditySensor = true
+          @humidityRoomDevice.system = @
+          @humidityRoomDevice.on @humidityRoomAttribute, @humidityRoomHandler
+          @humidityRoomSensor = true
+
+        # the outdoor sensors
+        @_temperatureOutdoorDevice = @config.temperatureOutdoor.replace("$","").trim()      
+        @_temperatureOutdoorDevice = @_temperatureOutdoorDevice.split('.')
+        if @_temperatureOutdoorDevice[0]?
+          @temperatureOutdoorDevice = @framework.deviceManager.getDeviceById(@_temperatureOutdoorDevice[0])     
+          unless @temperatureOutdoorDevice?
+            throw new Error "Unknown temperature Outdoor device '#{@temperatureOutdoorDevice}'"
+          @temperatureOutdoorAttribute = @_temperatureOutdoorDevice[1]
+          unless @temperatureOutdoorDevice.hasAttribute(@temperatureOutdoorAttribute)
+            throw new Error "Unknown temperature attribute '#{@temperatureOutdoorAttribute}'"
+          env.logger.debug "Temperature Outdoordevice found " + JSON.stringify(@temperatureOutdoorDevice.config,null,2)
+          @temperatureOutdoorDevice.getTemperature()
+          .then((temperatureOutdoor)=>
+            @changeTemperatureOutdoorTo(temperatureOutdoor)
+          )
+          @temperatureOutdoorDevice.system = @
+          @temperatureOutdoorDevice.on @temperatureOutdoorAttribute, @temperatureOutdoorHandler
+          @temperatureOutdoorSensor = true
+        @_humidityOutdoorDevice = @config.humidityOutdoor.replace("$","").trim()
+        @_humidityOutdoorDevice = @_humidityOutdoorDevice.split('.')
+        if @_humidityOutdoorDevice[0]?
+          @humidityOutdoorDevice = @framework.deviceManager.getDeviceById(@_humidityOutdoorDevice[0])     
+          unless @humidityOutdoorDevice?
+            throw new Error "Unknown humidity Outdoor device '#{@humidityOutdoorDevice}'"
+          @humidityOutdoorAttribute = @_humidityOutdoorDevice[1]
+          unless @humidityOutdoorDevice.hasAttribute(@humidityOutdoorAttribute)
+            throw new Error "Unknown humidity Outdoor attribute '#{@humidityOutdoorAttribute}'"
+          env.logger.debug "Humidity Outdoor device found " + JSON.stringify(@humidityOutdoorDevice.config,null,2)
+          @humidityOutdoorDevice.getHumidity()
+          .then((humidityOutdoor)=>
+            @changeHumidityOutdoorTo(humidityOutdoor)
+          )
+          @humidityOutdoorDevice.system = @
+          @humidityOutdoorDevice.on @humidityOutdoorAttribute, @humidityOutdoorHandler
+          @humidityOutdoorSensor = true
       )
 
       super()
 
-    temperatureHandler: (temperatureAmbiant) =>
-      @changeTemperatureAmbiantTo(temperatureAmbiant)
+    temperatureRoomHandler: (temperatureRoom) =>
+      @changeTemperatureRoomTo(temperatureRoom)
 
-    humidityHandler: (humidityAmbiant) =>
-      @changeHumidityAmbiantTo(humidityAmbiant)
+    humidityRoomHandler: (humidityRoom) =>
+      @changeHumidityRoomTo(humidityRoom)
+
+    temperatureOutdoorHandler: (temperatureOutdoor) =>
+      @changeTemperatureOutdoorTo(temperatureOutdoor)
+
+    humidityOutdoorHandler: (humidityOutdoor) =>
+      @changeHumidityOutdoorTo(humidityOutdoor)
 
     getMode: () -> Promise.resolve(@_mode)
     getPower: () -> Promise.resolve(@_power)
@@ -537,8 +600,10 @@ module.exports = (env) ->
     getActive: () -> Promise.resolve(@_active)
     getHeater: () -> Promise.resolve(@_heater)
     getCooler: () -> Promise.resolve(@_cooler)
-    getTemperatureAmbiant: () -> Promise.resolve(@_temperatureAmbiant)
-    getHumidityAmbiant: () -> Promise.resolve(@_humidityAmbiant)
+    getTemperatureRoom: () -> Promise.resolve(@_temperatureRoom)
+    getHumidityRoom: () -> Promise.resolve(@_humidityRoom)
+    getTemperatureOutdoor: () -> Promise.resolve(@_temperatureOutdoor)
+    getHumidityOutdoor: () -> Promise.resolve(@_humidityOutdoor)
     getTimeToTemperatureSetpoint: () -> Promise.resolve(@_timeToTemperatureSetpoint)
     getBattery: () -> Promise.resolve(@_battery)
     getSynced: () -> Promise.resolve(@_synced)
@@ -609,15 +674,25 @@ module.exports = (env) ->
       @_timeToTemperatureSetpoint = time
       @emit "timeToTemperatureSetpoint", @_timeToTemperatureSetpoint
 
-    _setTemperatureAmbiant: (temperatureAmbiant) ->
-      if temperatureAmbiant is @_temperatureAmbiant then return
-      @_temperatureAmbiant = temperatureAmbiant
-      @emit "temperatureAmbiant", @_temperatureAmbiant
+    _setTemperatureRoom: (temperatureRoom) ->
+      if temperatureRoom is @_temperatureRoom then return
+      @_temperatureRoom = temperatureRoom
+      @emit "temperatureRoom", @_temperatureRoom
 
-    _setHumidityAmbiant: (humidityAmbiant) ->
-      if humidityAmbiant is @_humidityAmbiant then return
-      @_humidityAmbiant = humidityAmbiant
-      @emit "humidityAmbiant", @_humidityAmbiant
+    _setHumidityRoom: (humidityRoom) ->
+      if humidityRoom is @_humidityRoom then return
+      @_humidityRoom = humidityRoom
+      @emit "humidityRoom", @_humidityRoom
+
+    _setTemperatureOutdoor: (temperatureOutdoor) ->
+      if temperatureOutdoor is @_temperatureOutdoor then return
+      @_temperatureOutdoor = temperatureOutdoor
+      @emit "temperatureOutdoor", @_temperatureOutdoor
+
+    _setHumidityOutdoor: (humidityOutdoor) ->
+      if humidityOutdoor is @_humidityOutdoor then return
+      @_humidityOutdoor = humidityOutdoor
+      @emit "humidityOutdoor", @_humidityOutdoor
 
     changeModeTo: (mode) ->
       @_setMode(mode)
@@ -657,13 +732,22 @@ module.exports = (env) ->
       @_setTimeToTemperatureSetpoint(time)
       return Promise.resolve()
 
-    changeTemperatureAmbiantTo: (temperatureAmbiant) ->
-      @_setTemperatureAmbiant(temperatureAmbiant)
+    changeTemperatureRoomTo: (temperatureRoom) ->
+      @_setTemperatureRoom(temperatureRoom)
       @handleTemperatureChange()
       return Promise.resolve()
 
-    changeHumidityAmbiantTo: (humidityAmbiant) ->
-      @_setHumidityAmbiant(humidityAmbiant)
+    changeHumidityRoomTo: (humidityRoom) ->
+      @_setHumidityRoom(humidityRoom)
+      return Promise.resolve()
+
+    changeTemperatureOutdoorTo: (temperatureOutdoor) ->
+      @_setTemperatureOutdoor(temperatureOutdoor)
+      @handleTemperatureChange()
+      return Promise.resolve()
+
+    changeHumidityOutdoorTo: (humidityOutdoor) ->
+      @_setHumidityOutdoor(humidityOutdoor)
       return Promise.resolve()
 
     changeTemperatureTo: (temperatureSetpoint) ->
@@ -690,21 +774,21 @@ module.exports = (env) ->
           .then((mode)=>
             switch mode
               when "heat"
-                if @_temperatureSetpoint > @_temperatureAmbiant
+                if @_temperatureSetpoint > @_temperatureRoom
                   @changeHeaterTo(on)
                 else
                   @changeHeaterTo(off)
               when "cool"
-                if @_temperatureSetpoint < @_temperatureAmbiant
+                if @_temperatureSetpoint < @_temperatureRoom
                   @changeCoolerTo(on)
                 else
                   @changeCoolerTo(off)
               when "heatcool"
-                if @_temperatureSetpointLow > @_temperatureAmbiant
+                if @_temperatureSetpointLow > @_temperatureRoom
                   @changeHeaterTo(on)
                 else
                   @changeHeaterTo(off)
-                if @_temperatureSetpointHigh < @_temperatureAmbiant
+                if @_temperatureSetpointHigh < @_temperatureRoom
                   @changeCoolerTo(on)
                 else
                   @changeCoolerTo(off)
@@ -750,10 +834,14 @@ module.exports = (env) ->
       )
 
     destroy: ->
-      if @temperatureDevice?
-        @temperatureDevice.removeListener(@temperatureAttribute, @temperatureHandler)
-      if @humidityDevice?
-        @humidityDevice.removeListener(@humidityAttribute, @humidityHandler)
+      if @temperatureRoomDevice?
+        @temperatureRoomDevice.removeListener(@temperatureRoomAttribute, @temperatureRoomHandler)
+      if @humidityRoomDevice?
+        @humidityRoomDevice.removeListener(@humidityRoomAttribute, @humidityRoomHandler)
+      if @temperatureOutdoorDevice?
+        @temperatureOutdoorDevice.removeListener(@temperatureOutdoorAttribute, @temperatureOutdoorHandler)
+      if @humidityOutdoorDevice?
+        @humidityOutdoorDevice.removeListener(@humidityOutdoorAttribute, @humidityOutdoorHandler)
       super()
 
 

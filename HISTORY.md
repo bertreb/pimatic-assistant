@@ -18,5 +18,5 @@
 	* changed Nora connection handling
 * 20200515, v0.1.0
 	* added Assistant Thermostat device
-* 20200515, v0.1.1
+* 20200515, v0.1.2
 	* fix waitforinit

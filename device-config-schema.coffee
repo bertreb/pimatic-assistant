@@ -61,11 +61,17 @@ module.exports = {
         description: "Specifies the minimum offset between heat-cool setpoints in Celsius, if heatcool mode is supported"
         type: "number"
         default: 2
-      temperatureDevice:
+      temperatureRoom:
         description: "The Pimatic device.temperature id for the thermostat room temperature"
         type: "string"
-      humidityDevice:
+      humidityRoom:
         description: "The Pimatic device.humidity id for the thermostat room humidity"
+        type: "string"
+      temperatureOutdoor:
+        description: "The Pimatic device.temperature id for the outdoor temperature"
+        type: "string"
+      humidityOutdoor:
+        description: "The Pimatic device.humidity id for the outdoor humidity"
         type: "string"
       pid:
         description: "Enable the PID controller for heater and cooler"
