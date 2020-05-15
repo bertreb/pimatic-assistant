@@ -35,8 +35,8 @@ module.exports = (env) ->
 
       @state =
         online: true
-        thermostatMode: "on"
-        thermostatTemperatureAmbient: 25
+        thermostatMode: "heat"
+        thermostatTemperatureAmbient: 20
         thermostatHumidityAmbient: 50
         thermostatTemperatureSetpoint: 20
         thermostatTemperatureSetpointLow: 18
@@ -83,9 +83,10 @@ module.exports = (env) ->
           @state.thermostatHumidityAmbient = humidity
           @device.on "humidityRoom", humidityHandler
           @humiditySensor = true
-      )#
+      )
       .finally(()=>
         #env.logger.info "State: " + JSON.stringify(@state,null,2)
+        @state.online = true
         @UpdateState(@id, @state)        
       )
 
@@ -99,10 +100,6 @@ module.exports = (env) ->
       @device.on "temperatureSetpointLow", setpointHandlerLow
       @device.on "temperatureSetpointHigh", setpointHandlerHigh
       @device.system = @
-
-    stateHandler: (mode, power, program) =>
-
-      return @state
 
     modeHandler = (mode) ->
       # device mode changed, updating device status in Nora
