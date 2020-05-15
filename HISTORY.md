@@ -26,3 +26,5 @@
 	* added 1 decimal place formatting of values
 * 20200515, v0.1.5
 	* fix attribute names
+* 20200515, v0.1.6
+	* completed 1 decimal place formatting of values
