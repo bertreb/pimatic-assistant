@@ -480,30 +480,44 @@ module.exports = (env) ->
           type: "boolean"
           hidden: true
 
-      @_temperatureDevice = @config.temperatureDevice.replace("$","").trim()
-      @_temperatureDevice = @_temperatureDevice.split('.')
-      if @_temperatureDevice[0]?
-        @temperatureDevice = @framework.deviceManager.getDeviceById(@_temperatureDevice[0])     
-        unless @temperatureDevice?
-          throw new Error "Unknown temperature device '#{@temperatureDevice}'"
-        @temperatureAttribute = @_temperatureDevice[1]
-        unless @temperatureDevice.hasAttribute(@temperatureAttribute)
-          throw new Error "Unknown temperature attribute '#{@temperatureAttribute}'"
-        @temperatureDevice.system = @
-        @temperatureDevice.on @temperatureAttribute, @temperatureHandler
-        @temperatureSensor = true
-      @_humidityDevice = @config.humidityDevice.replace("$","").trim()
-      @_humidityDevice = @_humidityDevice.split('.')
-      if @_humidityDevice[0]?
-        @humidityDevice = @framework.deviceManager.getDeviceById(@_humidityDevice[0])     
-        unless @humidityDevice?
-          throw new Error "Unknown humidity device '#{@humidityDevice}'"
-        @humidityAttribute = @_humidityDevice[1]
-        unless @humidityDevice.hasAttribute(@humidityAttribute)
-          throw new Error "Unknown humidity attribute '#{@humidityAttribute}'"
-        @humidityDevice.system = @
-        @humidityDevice.on @humidityAttribute, @humidityHandler
-        @humiditySensor = true
+      @framework.variableManager.waitForInit()
+      .then(()=>
+        @_temperatureDevice = @config.temperatureDevice.replace("$","").trim()      
+        @_temperatureDevice = @_temperatureDevice.split('.')
+        if @_temperatureDevice[0]?
+          @temperatureDevice = @framework.deviceManager.getDeviceById(@_temperatureDevice[0])     
+          unless @temperatureDevice?
+            throw new Error "Unknown temperature device '#{@temperatureDevice}'"
+          @temperatureAttribute = @_temperatureDevice[1]
+          env.logger.info "@temperatureAttribute " + JSON.stringify(@temperatureAttribute,null,2)
+          unless @temperatureDevice.hasAttribute(@temperatureAttribute)
+            throw new Error "Unknown temperature attribute '#{@temperatureAttribute}'"
+          env.logger.debug "Temperature device found " + JSON.stringify(@temperatureDevice.config,null,2)
+          @temperatureDevice.getTemperature()
+          .then((temperatureAmbiant)=>
+            @changeTemperatureAmbiantTo(temperatureAmbiant)
+          )
+          @temperatureDevice.system = @
+          @temperatureDevice.on @temperatureAttribute, @temperatureHandler
+          @temperatureSensor = true
+        @_humidityDevice = @config.humidityDevice.replace("$","").trim()
+        @_humidityDevice = @_humidityDevice.split('.')
+        if @_humidityDevice[0]?
+          @humidityDevice = @framework.deviceManager.getDeviceById(@_humidityDevice[0])     
+          unless @humidityDevice?
+            throw new Error "Unknown humidity device '#{@humidityDevice}'"
+          @humidityAttribute = @_humidityDevice[1]
+          unless @humidityDevice.hasAttribute(@humidityAttribute)
+            throw new Error "Unknown humidity attribute '#{@humidityAttribute}'"
+          env.logger.debug "Temperature device found " + JSON.stringify(@humidityDevice.config,null,2)
+          @humidityDevice.getHumidity()
+          .then((humidityAmbiant)=>
+            @changeHumidityAmbiantTo(humidityAmbiant)
+          )
+          @humidityDevice.system = @
+          @humidityDevice.on @humidityAttribute, @humidityHandler
+          @humiditySensor = true
+      )
 
       super()
 
