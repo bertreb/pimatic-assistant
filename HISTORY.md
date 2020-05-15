@@ -24,3 +24,5 @@
 	* added outdoor temperature and humidity
 * 20200515, v0.1.4
 	* added 1 decimal place formatting of values
+* 20200515, v0.1.5
+	* fix attribute names

@@ -61,27 +61,27 @@ module.exports = (env) ->
         @state.thermostatMode = mode
         @ambient = 0
         @ambiantSensor = false
-        if @device.hasAttribute('temperatureAmbiant')
-          return @device.getTemperatureAmbiant()
+        if @device.hasAttribute('temperatureRoom')
+          return @device.getTemperatureRoom()
         else
           return null
       )
       .then((temp)=>
         if temp?
           @state.thermostatTemperatureAmbient = temp
-          @device.on "temperatureAmbiant", temperatureHandler
+          @device.on "temperatureRoom", temperatureHandler
           @ambiantSensor = true
         @humidity = 0
         @humiditySensor = false
-        if @device.hasAttribute('humidityAmbiant')
-          return @device.getHumidityAmbiant()
+        if @device.hasAttribute('humidityRoom')
+          return @device.getHumidityRoom()
         else
           return null
       )
       .then((humidity)=>
         if humidity?
           @state.thermostatHumidityAmbient = humidity
-          @device.on "humidityAmbiant", humidityHandler
+          @device.on "humidityRoom", humidityHandler
           @humiditySensor = true
       )#
       .finally(()=>
