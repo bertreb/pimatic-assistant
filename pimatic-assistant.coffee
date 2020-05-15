@@ -277,7 +277,6 @@ module.exports = (env) ->
 
 
             if _newDevice?
-              devices[gaDeviceId]["online"] = true
               devices[gaDeviceId]["type"] = _newDevice.getType()
               devices[gaDeviceId]["name"] = _device.name
               devices[gaDeviceId]["state"] = _newDevice.getState()
