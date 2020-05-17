@@ -692,7 +692,7 @@ module.exports = (env) ->
       @emit "battery", @_battery
 
     _setActive: (active) ->
-      if active is @_active or @_power is false then return
+      if active is @_active then return
       @_active = active
       @emit "active", @_active
 

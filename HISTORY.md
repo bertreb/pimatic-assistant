@@ -30,5 +30,6 @@
 	* completed 1 decimal place formatting of values
 * 20200515, v0.1.10
 	* fix online status on startup
-* 20200517, v0.1.11
+* 20200517, v0.1.12
 	* edit heater and cooler switching
+	* edit active status
