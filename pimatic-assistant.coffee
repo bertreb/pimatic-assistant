@@ -804,11 +804,13 @@ module.exports = (env) ->
           .then((mode)=>
             switch mode
               when "heat"
+                @changeCoolerTo(off)
                 if @_temperatureSetpoint > @_temperatureRoom
                   @changeHeaterTo(on)
                 else
                   @changeHeaterTo(off)
               when "cool"
+                @changeHeaterTo(off)
                 if @_temperatureSetpoint < @_temperatureRoom
                   @changeCoolerTo(on)
                 else
