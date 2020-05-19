@@ -19,10 +19,6 @@
     "adapters/button.coffee",
     "adapters/blinds.coffee",
     "adapters/heatingthermostat.coffee",
-    "adapters/assistantthermostat.coffee",
-    "app/thermostat.coffee",
-    "app/thermostat.jade",
-    "app/thermostat.css",
     "README.md",
     "LICENSE"
   ],
@@ -33,7 +29,7 @@
     "google",
     "assistant"
   ],
-  "version": "0.1.12",
+  "version": "0.2.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bertreb/pimatic-assistant.git"

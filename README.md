@@ -10,11 +10,7 @@ Nora is a **NO**de-**R**ed home **A**utomation solution for connecting Node-red 
 For this plugin I'm not using node-red but use the Nora backend server directly.
 This plugin is also based on the work done for the Pimatic-gBridge plugin. Because the gBridge service is stopped, this plugin will be a good replacement.
 
-The Plugin contains 2 types of devices.
-
-1. The first type is an Assistant Device that interfaces with Google Assistant via Nora. Pimatic devices are added in the config. The mapping of states and actions from Pimatic from/to Google Assistant is done as best as possible.
-2. The second type are Google Assistant optimized Pimatic dummy devices. These devices expose the maximum capabilities of Google Assistant to be used in Pimatic.
-The first implemented device is the Assistant Thermostat.
+The Assistant Device interfaces with Google Assistant via Nora. Pimatic devices are added in the config. The mapping of states and actions from Pimatic from/to Google Assistant is done as best as possible.
 ------
 
 Before you can configure the plugin you need to get a Nora service token. The steps are:
@@ -91,68 +87,6 @@ Device configuration
 #### Deleting an Assistant device
 Before you delete an Assistant device, please remove first all devices in the Assistant device config and save the config. After that you can delete the Assistant device.
 
-Assistant Thermostat device
------------------
-
-The Assistant Thermostat device is a 'Dummy' device and supports several modes like 'heat, 'heatcool', 'cool' and 'eco'. With this device you can interface between Pimatic and Google Assistant for a maximum Thermostat experience. The Assistant Thermostat exposes several attributes and actions to be used in Pimatic.
-The device interfaces with a room temperature and humidity device and sets status for switching heater or cooler on.
-
-![device](https://github.com/bertreb/pimatic-assistant/blob/master/ui.png?raw=true)
-
-Features:
-- Setpoint for heating or cooling temperature
-- Heat-Cool mode with Low and High setpoint
-- Usage of Pimatic device(s) for room temperature and humidity
-- Status attributes to be used for switching on/off heater and cooler
-- Control Thermostat via rules
-- Eco and Manual/Schedule buttons
-
-Planned:
-- PID controller for heat and cool mode
-- Estimated time before setpoint is reached
-- Schedule mode logic
-- Eco mode logic
-- Modes: Purifier, Fan-only, Dry
-
-
-Device configuration
------------------
-
-```
-{
-  id:                         "<assistant-thermostat-id>"
-  class:                      "AssistantThermostat"
-  minThresholdCelsius:        "supported minimum temperature range for this device (in degrees Celsius)"
-  maxThresholdCelsius:        "supported maximum temperature range for this device (in degrees Celsius)"
-  thermostatTemperatureUnit:  "The unit the device is set to by default (C)"
-  bufferRangeCelsius:         "Specifies the minimum offset between heat-cool setpoints in Celsius, if heatcool mode is supported"
-  temperatureDevice:          "The Pimatic device id for the thermostat room temperature"
-  humidityDevice:             "The Pimatic device id for the thermostat room humidity"
-  pid:                        "Enable the PID controller for heater and cooler"
-}
-```
-
-The Assistant Thermostat can be controlled via rules. The action syntax is:
-
-```
-thermostat <assistant-thermostat id> [heat | heatcool | cool | eco | off | on | manual | schedule |
-  setpoint [5-30] | setpointLow [5-30] | setpointHigh [5-30]
-```
-Commands explained:
-
-- **heat**: enable heating function, setpoint is the target temperature
-- **cool**: enable cooling function, setpoint is the target temperature
-- **heatcool**: enable heatcool function. SetpointLow is the target temperature for heating and setpointHigh is the target temperature for cooling. The bufferRangeCelsius (device config) is the allowed difference between setpoint Low and High (buffer is the diffence). Heating starts when temperature is below setpointLow and cooling starts when temperature is above setpointHigh.
-- **eco**: sets the attribute Eco (no logic yet)
-- **off**: switches off the thermostat and switches heater and cooler off
-- **on**: when thermostat is in 'off' state, with the 'on' command the previsous stae is restored
-- **manual**: all function are manual (gui, rules or api) handled
-- **schedule**: a schedule is active and all manual functions are still available
-- **setpoint**: the target temperature for heating or cooling only mode
-- **setpointLow**: the target temperature for heating in 'heatcool' mode
-- **setpointHigh**: the target temperature for cooling in 'heatmode' mode
-
-In the gui the setpoint inputs are grayed out depending of the chosen mode (heat/cool or heatcool)
 
 -----------------
 

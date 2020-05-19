@@ -33,3 +33,5 @@
 * 20200517, v0.1.12
 	* edit heater and cooler switching
 	* edit active status
+* 20200519, v0.2.0
+	* moved DummyThermostat device to Dummies plugin
