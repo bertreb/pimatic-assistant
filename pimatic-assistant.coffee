@@ -10,10 +10,10 @@ module.exports = (env) ->
   buttonAdapter = require('./adapters/button')(env)
   blindsAdapter = require('./adapters/blinds')(env)
   heatingThermostatAdapter = require('./adapters/heatingthermostat')(env)
+  temperatureAdapter = require('./adapters/temperature')(env)
   #assistantThermostatAdapter = require('./adapters/assistantthermostat')(env)
   ###
   contactAdapter = require('./adapters/contact')(env)
-  temperatureAdapter = require('./adapters/temperature')(env)
   sceneAdapter = require('./adapters/scene')(env)
   ###
 
@@ -87,7 +87,7 @@ module.exports = (env) ->
             _fullDevice = @framework.deviceManager.getDeviceById(_device.pimatic_device_id)
             unless _fullDevice?
               throw new Error "Pimatic device '#{_device.pimatic_device_id}' does not excist"
-            unless @selectAdapter(_fullDevice)?
+            unless @selectAdapter(_fullDevice, _device.auxiliary, _device.auxiliary2)?
               throw new Error "Pimatic device class '#{_fullDevice.config.class}' is not supported"
 
         @initNoraConnection()
@@ -106,7 +106,7 @@ module.exports = (env) ->
     updateState: (id, newState) =>
       _a = {}
       _a[id] = newState
-      #env.logger.debug "updateState: " + JSON.stringify(_a,null,2)
+      env.logger.debug "updateState: " + JSON.stringify(_a,null,2)
       @socket.emit('update', _a, "req:" + id)
 
     initNoraConnection: () =>
@@ -187,7 +187,7 @@ module.exports = (env) ->
               auxiliary2: _device.auxiliary2
             #twoFa: _device.twofa
             #twoFaPin: if _value.twofaPin? then _value.twofaPin else undefined
-            switch @selectAdapter(pimaticDevice)
+            switch @selectAdapter(pimaticDevice, _device.auxiliary, _device.auxiliary2)
               when "lightColorMilight"
                 _newDevice = new lightColorMilightAdapter(_adapterConfig)
                 devices[gaDeviceId] =
@@ -241,18 +241,14 @@ module.exports = (env) ->
               when "blinds"
                 _newDevice = new blindsAdapter(_adapterConfig)
                 devices[gaDeviceId] = {}
-
-                ###
-                else if pimaticDevice instanceof env.devices.Sensor and pimaticDevice.hasAttribute('contact')
-                  env.logger.debug "Add contact adapter with ID: " + pimaticDevice.id
-                  @addAdapter(new contactAdapter(_adapterConfig))
-                ###
-                ###
-                else if pimaticDevice.hasAttribute(_value.auxiliary)
-                  env.logger.debug "Add temperature adapter with ID: " + pimaticDevice.id
-                  @addAdapter(new temperatureAdapter(_adapterConfig))
-                ###
-
+              when "temperature"
+                _newDevice = new temperatureAdapter(_adapterConfig)
+                devices[gaDeviceId] =
+                  temperatureUnit: "C"
+                  bufferRangeCelsius: pimaticDevice.bufferRangeCelsius
+                  commandOnlyTemperatureSetting: false
+                  queryOnlyTemperatureSetting: true
+                  availableModes: _newDevice.getModes()
               else
                 env.logger.debug "Device type #{pimaticDevice.config.class} is not supported!"
 
@@ -272,7 +268,7 @@ module.exports = (env) ->
         resolve(devices)
       )
 
-    selectAdapter: (pimaticDevice) ->
+    selectAdapter: (pimaticDevice, aux1, aux2) ->
       _foundAdapter = null
       if pimaticDevice.config.class is "MilightRGBWZone" or pimaticDevice.config.class is "MilightFullColorZone"
         _foundAdapter = "lightColorMilight"
@@ -292,6 +288,8 @@ module.exports = (env) ->
         _foundAdapter = "assistantThermostat"
       else if pimaticDevice instanceof env.devices.ShutterController
         _foundAdapter = "blinds"
+      else if pimaticDevice.hasAttribute(aux1)
+        _foundAdapter = "temperature"
 
       if _foundAdapter?
         env.logger.debug _foundAdapter + " device found"

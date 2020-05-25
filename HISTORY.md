@@ -36,4 +36,5 @@
 * 20200519, v0.2.0
 	* moved DummyThermostat device to Dummies plugin
 * 20200525, v0.2.1
-	* fix Blinds adapter
+	* fix blinds adapter
+	* add temperatur/humidity 'sensor' (emulated via thermostat)
