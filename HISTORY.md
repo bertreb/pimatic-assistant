@@ -35,3 +35,5 @@
 	* edit active status
 * 20200519, v0.2.0
 	* moved DummyThermostat device to Dummies plugin
+* 20200525, v0.2.1
+	* fix Blinds adapter
