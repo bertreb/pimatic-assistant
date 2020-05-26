@@ -75,7 +75,7 @@ module.exports = (env) ->
         return
       @changePositionTo(change.openPercent)
 
-    changePositionTo: (poisition) =>
+    changePositionTo: (value) =>
       if @positionCommand? and @positionCommand isnt ""
         value=Math.max(0,value)
         value = Math.min(100,value)

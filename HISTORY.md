@@ -41,3 +41,5 @@
 * 20200526, v0.2.2
 	* fix temperature
 	* fix shutter
+* 20200526, v0.2.3
+	* fix shutter
