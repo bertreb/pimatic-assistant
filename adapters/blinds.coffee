@@ -70,9 +70,9 @@ module.exports = (env) ->
       # device status changed, updating device status in Nora
       env.logger.debug "Received action, change: " + JSON.stringify(change,null,2)
       @state.openPercent = change.openPercent
-      if @position is change.openPercent
-        env.logger.debug "Shutter already in requested postion"
-        return
+      #if @position is change.openPercent
+      #  env.logger.debug "Shutter already in requested postion"
+      #  return
       @changePositionTo(change.openPercent)
 
     changePositionTo: (value) =>
