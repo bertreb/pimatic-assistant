@@ -40,6 +40,7 @@ module.exports = (env) ->
         if @device.hasAttribute(@temperatureAttribute)
           temp = @device.getLastAttributeValue(@temperatureAttribute)
           @state.thermostatTemperatureAmbient = temp
+          @state.thermostatTemperatureSetpoint = temp
           @device.on @temperatureAttribute, temperatureHandler
           @temperatureSensor = true
         if @device.hasAttribute(@humidityAttribute)

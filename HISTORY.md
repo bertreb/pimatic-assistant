@@ -38,3 +38,6 @@
 * 20200525, v0.2.1
 	* fix blinds adapter
 	* add temperatur/humidity 'sensor' (emulated via thermostat)
+* 20200526, v0.2.2
+	* fix temperature
+	* fix shutter

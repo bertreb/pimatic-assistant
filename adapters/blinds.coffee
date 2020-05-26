@@ -39,19 +39,35 @@ module.exports = (env) ->
         online: true
         openPercent: 0
 
-      @device.getPosition()
-      .then((position)=>
-        @state.openPercent = position
-        @UpdateState(@id, @state)
-      )
+      #@device.getPosition()
+      #.then((position)=>
+      #  @state.openPercent = position
+      #  @UpdateState(@id, @state)
+      #)
 
     devicePositionHandler = (position) ->
       # device status changed, updating device status in Nora
-      @system.updatePosition(position)
+      switch position
+        when "up"
+          newPosition = @system.position + 10
+          if newPosition > 100
+            newPosition = 100
+            env.logger.debug "Shutter already fully open"
+          @system.updatePosition(newPosition)
+        when "down"
+          newPosition = @system.position - 10
+          if newPosition < 0
+            newPosition = 0
+            env.logger.debug "Shutter already fully closed"
+          @system.updatePosition(newPosition)
+        when "stopped"
+          env.logger.debug "Stopped received, no further action"
+        else
+          env.logger.debug "Unknown position command '#{position}' from '#{@system.id}'"
+
 
     executeAction: (change) ->
       # device status changed, updating device status in Nora
-      env.logger.debug "received action, type: " + type + ", state: " + value
       env.logger.debug "Received action, change: " + JSON.stringify(change,null,2)
       @state.openPercent = change.openPercent
       if @position is change.openPercent
@@ -60,7 +76,7 @@ module.exports = (env) ->
       @changePositionTo(change.openPercent)
 
     changePositionTo: (poisition) =>
-      if @positionCommand?
+      if @positionCommand? and @positionCommand isnt ""
         value=Math.max(0,value)
         value = Math.min(100,value)
         command = @positionCommand + " #{value}"
@@ -87,12 +103,16 @@ module.exports = (env) ->
             env.logger.debug "Received position: " + @position
         )
         env.logger.debug "Shutter moved from #{@position} to #{value}"
+      else
+        env.logger.debug "No position command set in config, shutter not moved"
+
 
 
     updatePosition: (newPosition) =>
       unless newPosition is @state.openPercent
         env.logger.debug "Update position to " + newPosition
-        @state.on = newPosition
+        @state.openPercent = newPosition
+        @position = newPosition
         @UpdateState(@id, @state)
 
     getType: () ->
