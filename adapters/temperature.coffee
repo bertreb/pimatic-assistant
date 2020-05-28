@@ -71,6 +71,7 @@ module.exports = (env) ->
       unless newTemperature is @state.thermostatTemperatureAmbient
         env.logger.debug "Update ambiant temperature to " + newTemperature
         @state.thermostatTemperatureAmbient = newTemperature
+        @state.thermostatTemperatureSetpoint = newTemperature
         @UpdateState(@id, @state)
 
     updateHumidity: (newHumidity) =>

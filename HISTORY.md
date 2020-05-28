@@ -43,3 +43,5 @@
 	* fix shutter
 * 20200526, v0.2.4
 	* fix shutter
+* 20200528, v0.2.5
+	* fix temperature sync
