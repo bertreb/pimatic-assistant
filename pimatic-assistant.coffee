@@ -90,6 +90,8 @@ module.exports = (env) ->
             unless @selectAdapter(_fullDevice, _device.auxiliary, _device.auxiliary2)?
               throw new Error "Pimatic device class '#{_fullDevice.config.class}' is not supported"
 
+        @nrOfDevices = _.size(@configDevices)
+        env.logger.debug "Number of devices: " + @nrOfDevices 
         @initNoraConnection()
       )
 
@@ -156,6 +158,7 @@ module.exports = (env) ->
       @guardInterval = 300000
       connectionGuard = () =>
         #env.logger.debug "GUARD: connection status connected: " + JSON.stringify(@socket.connected,null,2)
+        unless @nrOfDevices > 0 then return
         if not @socket? or @socket.connected is false
           env.logger.debug "GUARD: Nora not connected, try to force re-connect"
           @socket.close()
@@ -163,6 +166,7 @@ module.exports = (env) ->
           @socket = null
           @initNoraConnection()
         else
+          env.logger.debug "GUARD: Nora connected"
           @connectionGuardTimer = setTimeout(connectionGuard, @guardInterval)
       @connectionGuardTimer = setTimeout(connectionGuard, @guardInterval)
 

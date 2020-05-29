@@ -45,3 +45,6 @@
 	* fix shutter
 * 20200528, v0.2.5
 	* fix temperature sync
+* 20200528, v0.2.6
+	* update guard
+	* add temperature readme
