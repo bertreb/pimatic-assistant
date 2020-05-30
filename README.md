@@ -12,8 +12,8 @@ This plugin is also based on the work done for the Pimatic-gBridge plugin. Becau
 
 The Assistant Device interfaces with Google Assistant via Nora. Pimatic devices are added in the config. The mapping of states and actions from Pimatic from/to Google Assistant is done as best as possible.
 
-------
-
+Preparation
+---------
 Before you can configure the plugin you need to get a Nora service token. The steps are:
 
 - Go to the [NORA homepage](https://node-red-google-home.herokuapp.com/)
