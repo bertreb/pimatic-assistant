@@ -11,6 +11,7 @@ For this plugin I'm not using node-red but use the Nora backend server directly.
 This plugin is also based on the work done for the Pimatic-gBridge plugin. Because the gBridge service is stopped, this plugin will be a good replacement.
 
 The Assistant Device interfaces with Google Assistant via Nora. Pimatic devices are added in the config. The mapping of states and actions from Pimatic from/to Google Assistant is done as best as possible.
+
 ------
 
 Before you can configure the plugin you need to get a Nora service token. The steps are:
