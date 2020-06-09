@@ -11,11 +11,10 @@ module.exports = (env) ->
   blindsAdapter = require('./adapters/blinds')(env)
   heatingThermostatAdapter = require('./adapters/heatingthermostat')(env)
   temperatureAdapter = require('./adapters/temperature')(env)
-  #assistantThermostatAdapter = require('./adapters/assistantthermostat')(env)
-  ###
-  contactAdapter = require('./adapters/contact')(env)
-  sceneAdapter = require('./adapters/scene')(env)
-  ###
+  # vacuumAdapter = require('./adapters/vacuum')(env)
+  # assistantThermostatAdapter = require('./adapters/assistantthermostat')(env)
+  # contactAdapter = require('./adapters/contact')(env)
+  # sceneAdapter = require('./adapters/scene')(env)
 
   io = require('socket.io-client')
   _ = require('lodash')
@@ -75,6 +74,7 @@ module.exports = (env) ->
 
       checkMultipleDevices = []
       @configDevices = []
+      @nrOfDevices = 0
       @framework.variableManager.waitForInit()
       .then(()=>
         for _device in @config.devices
@@ -91,7 +91,7 @@ module.exports = (env) ->
               throw new Error "Pimatic device class '#{_fullDevice.config.class}' is not supported"
 
         @nrOfDevices = _.size(@configDevices)
-        env.logger.debug "Number of devices: " + @nrOfDevices 
+        env.logger.debug "Number of devices: " + @nrOfDevices
         @initNoraConnection()
       )
 
@@ -116,13 +116,13 @@ module.exports = (env) ->
       @socket = io(@uri, {autoConnect:true, reconnection:true, reconnectionDelay:20000, randomizationFactor:0.2})
 
       @socket.on 'connect', () =>
-        @_setPresence(yes)
         env.logger.debug "NORA - connected to Nora server"
         @getSyncDevices(@configDevices)
         .then((syncDevices)=>
           @socket.emit('sync', syncDevices, 'req:sync')
-          env.logger.debug "NORA - after device start, devices synced: " + JSON.stringify(syncDevices,null,2)
-          if _.size(syncDevices)>0
+          @nrOfDevices = _.size(syncDevices)
+          env.logger.debug "NORA - after device start, devices synced: " + @nrOfDevices
+          if @nrOfDevices > 0
             @_setPresence(true)
           else
             @socket.disconnect()
@@ -157,8 +157,10 @@ module.exports = (env) ->
 
       @guardInterval = 300000
       connectionGuard = () =>
-        #env.logger.debug "GUARD: connection status connected: " + JSON.stringify(@socket.connected,null,2)
-        unless @nrOfDevices > 0 then return
+        env.logger.debug "GUARD: Interval check, nrOfDevices: " + @nrOfDevices
+        if @nrOfDevices is 0
+          env.logger.debug "GUARD: stopping, nr of devices is #{@nrOfDevices}"
+          return
         if not @socket? or @socket.connected is false
           env.logger.debug "GUARD: Nora not connected, try to force re-connect"
           @socket.close()
@@ -245,6 +247,10 @@ module.exports = (env) ->
               when "blinds"
                 _newDevice = new blindsAdapter(_adapterConfig)
                 devices[gaDeviceId] = {}
+                #when "vacuum"
+                #_newDevice = new vacuumAdapter(_adapterConfig)
+                #devices[gaDeviceId] =
+                #  pausable: true
               when "temperature"
                 _newDevice = new temperatureAdapter(_adapterConfig)
                 devices[gaDeviceId] =
@@ -282,6 +288,8 @@ module.exports = (env) ->
         _foundAdapter = "lightTemperature"
       else if (pimaticDevice.config.class).indexOf("Dimmer") >= 0
         _foundAdapter = "light"
+      else if ((pimaticDevice.config.id).toLowerCase()).indexOf("vacuum") >= 0
+        _foundAdapter = "vacuum"
       else if (pimaticDevice.config.class).indexOf("Switch") >= 0
         _foundAdapter = "switch"
       else if pimaticDevice instanceof env.devices.ButtonsDevice
