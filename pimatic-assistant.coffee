@@ -80,18 +80,29 @@ module.exports = (env) ->
         for _device in @config.devices
           do(_device) =>
             if _.find(checkMultipleDevices, (d) => d.pimatic_device_id is _device.pimatic_device_id and d.pimatic_subdevice_id is _device.pimatic_device_id)?
-              throw new Error "Pimatic device '#{_device.pimatic_device_id}' is already used"
+              env.logger.info "Pimatic device '#{_device.pimatic_device_id}' is already used"
             else
-              checkMultipleDevices.push _device
-            @configDevices.push _device
-            _fullDevice = @framework.deviceManager.getDeviceById(_device.pimatic_device_id)
-            unless _fullDevice?
-              throw new Error "Pimatic device '#{_device.pimatic_device_id}' does not excist"
-            unless @selectAdapter(_fullDevice, _device.auxiliary, _device.auxiliary2)?
-              throw new Error "Pimatic device class '#{_fullDevice.config.class}' is not supported"
-
+              _fullDevice = @framework.deviceManager.getDeviceById(_device.pimatic_device_id)
+              if _fullDevice?
+                if @selectAdapter(_fullDevice, _device.auxiliary, _device.auxiliary2)?
+                  if _fullDevice.config.class is "ButtonsDevice"
+                    _button = _.find(_fullDevice.config.buttons, (b) => _device.pimatic_subdevice_id == b.id)
+                    if _button?
+                      checkMultipleDevices.push _device
+                      @configDevices.push _device
+                    else
+                      #throw new Error "Please remove button in Assistant"
+                      env.logger.info "Please remove button also in Assistant!"
+                  else
+                    checkMultipleDevices.push _device
+                    @configDevices.push _device
+                else
+                  env.logger.info "Pimatic device class '#{_fullDevice.config.class}' is not supported"                  
+              else
+                env.logger.info "Pimatic device '#{_device.pimatic_device_id}' does not excist"
+                
         @nrOfDevices = _.size(@configDevices)
-        env.logger.debug "Number of devices: " + @nrOfDevices
+        env.logger.debug "Number of devices: " + @nrOfDevices + ", " + JSON.stringify(@configDevices,null,2)
         @initNoraConnection()
       )
 

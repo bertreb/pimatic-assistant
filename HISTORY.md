@@ -50,3 +50,5 @@
 	* add temperature readme
 * 20200606, v0.2.7
 	* extra check on used device removal
+* 20200606, v0.2.8
+	* on restart the non existing devices are skipped
