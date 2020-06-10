@@ -48,3 +48,5 @@
 * 20200606, v0.2.6
 	* update guard
 	* add temperature readme
+* 20200606, v0.2.7
+	* extra check on used device removal

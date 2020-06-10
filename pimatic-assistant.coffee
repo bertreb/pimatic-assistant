@@ -97,9 +97,17 @@ module.exports = (env) ->
 
 
       @framework.on "deviceRemoved", (device) =>
-        if _.find(@config.devices, (d) => d.pimatic_device_id == device.id)
+        if _.find(@config.devices, (d) => d.pimatic_device_id == device.id or d.pimatic_subdevice_id == device.id)
           #throw new Error "Please remove device also in Assistant"
-          env.logger.info "please remove device also in Assistant!"
+          env.logger.info "Please remove device also in Assistant!"
+
+      @framework.on "deviceChanged", (device) =>
+        if device.config.class is "ButtonsDevice"
+          _device = _.find(@config.devices, (d) => d.pimatic_device_id == device.id)
+          if _device?
+            unless _.find(device.config.buttons, (b)=> b.id == _device.pimatic_subdevice_id)
+              #throw new Error "Please remove device also in Assistant"
+              env.logger.info "Please remove button also in Assistant!"
 
       #if @socket.connected then @_setPresence(true) else @_setPresence(false)
 
