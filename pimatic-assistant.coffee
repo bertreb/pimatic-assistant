@@ -335,13 +335,13 @@ module.exports = (env) ->
       )
 
     destroy: ->
+      for i, handler of @handlers
+        handler.destroy()
+        delete @handlers[i]
       if @socket?
         @socket.disconnect()
         @socket.removeAllListeners()
       clearTimeout(@connectionGuardTimer)
-      for i, handler of @handlers
-        handler.destroy()
-        delete @handlers[i]
 
       super()
 

@@ -65,4 +65,6 @@ module.exports = (env) ->
       return @state
 
     destroy: ->
+      @state.online = false;
+      @system.updateState(@state)
       @device.removeListener "state", deviceStateHandler

@@ -90,6 +90,8 @@ module.exports = (env) ->
       return @modes
 
     destroy: ->
+      @state.online = false;
+      @system.updateState(@state)
       if @temperatureSensor
         @device.removeListener @temperatureAttribute, temperatureHandler
       if @humiditySensor

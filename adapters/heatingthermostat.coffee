@@ -152,6 +152,8 @@ module.exports = (env) ->
       return @modes
 
     destroy: ->
+      @state.online = false;
+      @system.updateState(@state)
       @device.removeListener "mode", modeHandler
       @device.removeListener "temperatureSetpoint", setpointHandler
       if @ambientDevice?

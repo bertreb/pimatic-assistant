@@ -54,3 +54,4 @@
 	* on restart the non existing devices are skipped
 * 2020060614, v0.2.9
 	* support of groupname per assistant device
+	* added offline state on shutdown
