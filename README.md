@@ -79,6 +79,7 @@ Device configuration
 {
   id:     "<assistant-device-id>"
   class:  "AssistantDevice"
+    group:    "name for grouping the devices of this assistant device (default = 'pimatic')"
     devices:  "list of devices connected to Google Assistant"
       name:                 "the device name, and command used in Google Assistant"
       roomHint:             "the optional roomname used in Google Assistant"
@@ -91,6 +92,9 @@ Device configuration
       pin:                  "when twofa "pin" is used, the pin string (default: '0000')"
 }
 ```
+
+#### Group
+You can have 3 simultaneous connections with the nora-backend. So 3 different sources can provide the devices towards Google home. A group name is linked to one connection. The token is the same for all connections. 
 #### Two-step confirmation
 2-step confirmation (twofa) is supported. When you enable twofa you can use "ack", the assistant will ask if you are sure you what to execute the action. When you enable "pin", Google Assistant will ask for the pin to confirm the action. You need to enter the pin via the 'keyboard'.
 
