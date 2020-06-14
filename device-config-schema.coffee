@@ -5,6 +5,10 @@ module.exports = {
     type: "object"
     extensions: ["xLink", "xAttributeOptions"]
     properties:
+      group:
+        description: "The groupname the devices as grouped in"
+        type: "string"
+        default: "pimatic"
       devices:
         description: "list of  devices connected to Google Assistant"
         format: "table"

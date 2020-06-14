@@ -30,7 +30,7 @@
     "google",
     "assistant"
   ],
-  "version": "0.2.8",
+  "version": "0.2.9",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bertreb/pimatic-assistant.git"

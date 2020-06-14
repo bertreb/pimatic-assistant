@@ -53,17 +53,17 @@ module.exports = (env) ->
       #@config = config
       @id = @config.id
       @name = @config.name
+      @group = @config.group ? "pimatic"
 
       #if @_destroyed then return
 
       version = "0.0.34" # is latest node-red-nora-contrib version
       notify = true
-      group = "pimatic"
       @uri = 'https://node-red-google-home.herokuapp.com/?' +
         'version=' + version +
         '&token=' + encodeURIComponent(@plugin.config.token) +
         '&notify=' + notify +
-        '&group=' + encodeURIComponent(group)
+        '&group=' + encodeURIComponent(@group)
 
 
       @_presence = lastState?.presence?.value or off
