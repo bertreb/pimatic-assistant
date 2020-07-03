@@ -268,4 +268,7 @@ module.exports = (env) ->
       @device.removeListener "program", programHandler
       @device.removeListener "temperature", temperatureHandler
       @device.removeListener "humidity", humidityHandler
+      @state.online = false;
+      @UpdateState(@state)
+
 

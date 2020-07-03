@@ -62,6 +62,8 @@ For the HeatingThermostat you can add a temperature/humidity sensor. In the auxi
 The heating device is only using the temperature setting of the device.
 The following modes are supported: off and heat.
 
+Starting from version 0.2.11 you can use the DummyThermostat. This is an extended Thermostat that uses all the functionality of Google Assistant. DummyThermostat is part of the pimatic-dummis plugin.
+
 #### Temperature
 The temperature/humidity sensor is not supported directly by Nora and Google Assistant. This temperature/humidity sensor via implemented via a DummyThermostat.
 The configuration is as follows:

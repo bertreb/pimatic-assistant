@@ -55,3 +55,6 @@
 * 2020060614, v0.2.10
 	* support of groupname per assistant device
 	* added offline state on shutdown
+* 202007023, v0.2.11
+	* fix on update device config
+	* added support DummyThermostat

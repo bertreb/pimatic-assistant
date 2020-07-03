@@ -11,8 +11,8 @@ module.exports = (env) ->
   blindsAdapter = require('./adapters/blinds')(env)
   heatingThermostatAdapter = require('./adapters/heatingthermostat')(env)
   temperatureAdapter = require('./adapters/temperature')(env)
+  assistantThermostatAdapter = require('./adapters/assistantthermostat')(env)
   # vacuumAdapter = require('./adapters/vacuum')(env)
-  # assistantThermostatAdapter = require('./adapters/assistantthermostat')(env)
   # contactAdapter = require('./adapters/contact')(env)
   # sceneAdapter = require('./adapters/scene')(env)
 
@@ -55,7 +55,7 @@ module.exports = (env) ->
       @name = @config.name
       @group = @config.group ? "pimatic"
 
-      #if @_destroyed then return
+      if @_destroyed then return
 
       version = "0.0.34" # is latest node-red-nora-contrib version
       notify = true
@@ -102,7 +102,7 @@ module.exports = (env) ->
                 env.logger.info "Pimatic device '#{_device.pimatic_device_id}' does not excist"
                 
         @nrOfDevices = _.size(@configDevices)
-        env.logger.debug "Number of devices: " + @nrOfDevices + ", " + JSON.stringify(@configDevices,null,2)
+        #env.logger.debug "Number of devices: " + @nrOfDevices + ", " + JSON.stringify(@configDevices,null,2)
         @initNoraConnection()
       )
 
@@ -127,7 +127,7 @@ module.exports = (env) ->
     updateState: (id, newState) =>
       _a = {}
       _a[id] = newState
-      env.logger.debug "updateState: " + JSON.stringify(_a,null,2)
+      #env.logger.debug "updateState: " + JSON.stringify(_a,null,2)
       @socket.emit('update', _a, "req:" + id)
 
     initNoraConnection: () =>
@@ -149,7 +149,7 @@ module.exports = (env) ->
         )
 
       @socket.on 'update', (changes) =>
-        env.logger.debug "NORA - update received " + JSON.stringify(changes,null,2)
+        #env.logger.debug "NORA - update received " + JSON.stringify(changes,null,2)
         @handleUpdate(changes)
         .then((result)=>
         )
@@ -201,6 +201,7 @@ module.exports = (env) ->
         for _device, key in configDevices
           pimaticDevice = @devMgr.getDeviceById(_device.pimatic_device_id)
           _newDevice = null
+          env.logger.info "PimaticDevice: " + pimaticDevice.id
           if pimaticDevice?
             gaDeviceId = toGA(_device.pimatic_device_id)
             _adapterConfig =
@@ -210,6 +211,7 @@ module.exports = (env) ->
               pimaticSubDeviceId: _device.pimatic_subdevice_id
               auxiliary: _device.auxiliary
               auxiliary2: _device.auxiliary2
+
             #twoFa: _device.twofa
             #twoFaPin: if _value.twofaPin? then _value.twofaPin else undefined
             switch @selectAdapter(pimaticDevice, _device.auxiliary, _device.auxiliary2)
@@ -253,13 +255,13 @@ module.exports = (env) ->
                   commandOnlyTemperatureSetting: false
                   queryOnlyTemperatureSetting: false
                   availableModes: _newDevice.getModes()
-              when "assistantThermostat"
+              when "dummyThermostat"
                 #@ambiantDevice = if _device.auxiliary? then @devMgr.getDeviceById(_device.auxiliary) else null
                 #_adapterConfig["auxiliary"] = @ambiantDevice
                 _newDevice = new assistantThermostatAdapter(_adapterConfig)
                 devices[gaDeviceId] =
                   temperatureUnit: "C"
-                  bufferRangeCelsius: 2#pimaticDevice.bufferRangeCelsius
+                  bufferRangeCelsius: 2 #pimaticDevice.bufferRangeCelsius
                   commandOnlyTemperatureSetting: false
                   queryOnlyTemperatureSetting: false
                   availableModes: _newDevice.getModes()
@@ -315,8 +317,8 @@ module.exports = (env) ->
         _foundAdapter = "button"
       else if pimaticDevice instanceof env.devices.DummyHeatingThermostat
         _foundAdapter = "heatingThermostat"
-      else if pimaticDevice.config.class is "AssistantThermostat"
-        _foundAdapter = "assistantThermostat"
+      else if pimaticDevice.config.class is "DummyThermostat"
+        _foundAdapter = "dummyThermostat"
       else if pimaticDevice instanceof env.devices.ShutterController
         _foundAdapter = "blinds"
       else if pimaticDevice.hasAttribute(aux1)

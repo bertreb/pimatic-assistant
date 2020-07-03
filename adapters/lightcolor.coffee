@@ -115,7 +115,7 @@ module.exports = (env) ->
 
     destroy: ->
       @state.online = false;
-      @system.updateState(@state)
+      @UpdateState(@state)
       @device.removeListener 'state', deviceStateHandler if @stateAvavailable
       @device.removeListener 'dimlevel', deviceDimlevelHandler
       @device.removeListener 'hue', deviceHueHandler
