@@ -243,6 +243,8 @@ module.exports = (env) ->
                 _newDevice = new switchAdapter(_adapterConfig)
                 devices[gaDeviceId] = {}
               when "button"
+                gaDeviceId = gaDeviceId + '.' + _device.pimatic_subdevice_id
+                _adapterConfig.id = gaDeviceId
                 _newDevice = new buttonAdapter(_adapterConfig)
                 devices[gaDeviceId] = {}
               when "heatingThermostat"

@@ -58,3 +58,5 @@
 * 202007023, v0.2.11
 	* fix on update device config
 	* added support DummyThermostat
+* 20200909, v0.2.12
+	* added multiple button support

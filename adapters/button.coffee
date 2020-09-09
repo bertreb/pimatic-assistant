@@ -21,6 +21,7 @@ module.exports = (env) ->
       ###
 
       @id = adapterConfig.id
+      env.logger.debug "Button created id: " + @id
       @device = adapterConfig.pimaticDevice
       @subDeviceId = adapterConfig.pimaticSubDeviceId
       @UpdateState = adapterConfig.updateState
@@ -28,8 +29,12 @@ module.exports = (env) ->
       @twoFa = adapterConfig.twoFa
       @twoFaPin = adapterConfig.twoFaPin
 
-      @device.on "state", deviceStateHandler
       @device.system = @
+
+      @device.on "button", buttonHandler = (buttonId) =>
+        #env.logger.debug "Pushed button ButtonId: " + buttonId
+        #if buttonId is @subDeviceId
+        @updateState(buttonId)
 
       @state =
         online: true
@@ -38,13 +43,14 @@ module.exports = (env) ->
       @device.getButton()
       .then((buttonId)=>
         if buttonId is @subDeviceId
-          @state.on = state
+          @state.on = true
           @UpdateState(@id, @state)
       )
 
-    deviceStateHandler = (state) ->
-      # device status changed, updating device status in Nora
-      @system.updateState(state)
+    #buttonHandler = (buttonId) ->
+    #  # device status changed, updating device status in Nora
+    #  if buttonId is @device.system.subDeviceId
+    #    @system.updateState(buttonId)
 
     executeAction: (change) ->
       # device status changed, updating device status in Nora
@@ -57,11 +63,19 @@ module.exports = (env) ->
           env.logger.error "error: " + err
         )
 
-    updateState: (newState) =>
-      unless newState is @state.on
-        env.logger.debug "Update state to " + newState
-        @state.on = newState
+    updateState: (buttonId) =>
+      #unless newState is @state.on
+      #env.logger.debug "ButtonId: " + buttonId + ", @subDeviceId: " + @subDeviceId
+      if buttonId is @subDeviceId
+        @state.on = true
         @UpdateState(@id, @state)
+        env.logger.debug "Switch on " + @id
+      else
+        @state.on = false
+        @UpdateState(@id, @state)
+        env.logger.debug "Switch off " + @id
+      #@state.on = newState
+      #@UpdateState(@id, @state)
 
     getType: () ->
       return "switch"
@@ -72,4 +86,4 @@ module.exports = (env) ->
     destroy: ->
       @state.online = false;
       @updateState(@state)
-      @device.removeListener "state", deviceStateHandler
+      #@device.removeListener "button", buttonHandler
