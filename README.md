@@ -54,6 +54,9 @@ In this release the SwitchActuator, DimmerActuator, ButtonsDevice, ShutterContro
 When there's at least 1 device added, the connection to Nora is made. When connected the dot will go to present.
 
 Some specific configurations:
+#### Button
+For the Buttons device the auxiliary field is used to identify the button. The id of the button can not contain a hyphen ('-'). You can use an underscore to make the id readable.
+
 #### Shutter
 For the Shutter device the auxiliary field is used to control a shutter via a shell script. The position of the shutter (the value) is added at the end of the script (with a space) before executing the script. A return value is used as actual shutter position.
 
