@@ -132,6 +132,9 @@ module.exports = (env) ->
 
     initNoraConnection: () =>
 
+      env.logger.debug "Starting initNoraConnection"
+      #env.logger.debug "@uri: " + JSON.stringify(@uri,null,2)
+
       @socket = io(@uri, {autoConnect:true, reconnection:true, reconnectionDelay:20000, randomizationFactor:0.2})
 
       @socket.on 'connect', () =>

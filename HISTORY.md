@@ -60,3 +60,5 @@
 	* added support DummyThermostat
 * 20200909, v0.2.12
 	* added multiple button support
+* 20201213, v0.2.13
+	* fix light deviceHue error
