@@ -204,7 +204,7 @@ module.exports = (env) ->
         for _device, key in configDevices
           pimaticDevice = @devMgr.getDeviceById(_device.pimatic_device_id)
           _newDevice = null
-          env.logger.info "PimaticDevice: " + pimaticDevice.id
+          #env.logger.info "PimaticDevice: " + pimaticDevice.id
           if pimaticDevice?
             gaDeviceId = toGA(_device.pimatic_device_id)
             _adapterConfig =

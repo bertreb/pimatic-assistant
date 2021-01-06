@@ -62,3 +62,5 @@
 	* added multiple button support
 * 20201213, v0.2.13
 	* fix light deviceHue error
+* 20210106, v0.2.14
+	* remove info message in SyncDevices
